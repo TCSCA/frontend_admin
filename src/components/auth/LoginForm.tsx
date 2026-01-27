@@ -139,14 +139,15 @@ export default function LoginForm() {
     try {
       setUsername(username);
       setPassword(password);
-      const response: ResponseApi = await callApi.post("/api/auth/login", {
-        username: username,
-        password: password,
-      });
+      // const response: ResponseApi = await callApi.post("/api/auth/login", {
+      //   username: username,
+      //   password: password,
+      // });
 
-      if (response.status) {
+      // if (response.status) {
+      if (true) {
         setSubmitSuccess(true);
-        console.log("Login exitoso:", response);
+        console.log("Login exitoso:", true);
 
         // Set session cookies
         // const cookieOptions = { 
@@ -156,7 +157,7 @@ export default function LoginForm() {
         // };
 
         // Set auth cookies
-        Cookies.set("token", response.data.token, { expires: 1 });
+        Cookies.set("token", "equis", { expires: 1 });
         // Cookies.set("username", response.data.user.nombre, cookieOptions);
         // Cookies.set("email", response.data.user.mail, cookieOptions);
         // Cookies.set("idProfile", response.data.perfil.id_perfil, cookieOptions);
@@ -178,16 +179,16 @@ export default function LoginForm() {
         router.push(`/dashboard`);
 
       } else {
-        reset({ password: "" });
-        // Handle login failure
-        const errorMessage = response.data?.message || response.message || "Credenciales inválidas";
-        console.log("Login fallido:", response.message);
-        setSubmitError(errorMessage);
-        toast({
-          title: "Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
+        // reset({ password: "" });
+        // // Handle login failure
+        // const errorMessage = response.data?.message || response.message || "Credenciales inválidas";
+        // console.log("Login fallido:", response.message);
+        // setSubmitError(errorMessage);
+        // toast({
+        //   title: "Error",
+        //   description: errorMessage,
+        //   variant: "destructive",
+        // });
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "No se pudo conectar con el servidor";

@@ -10,7 +10,8 @@ import {
     Pill,
     LogOut,
     Truck,
-    FileUp
+    FileUp,
+    UserIcon
 } from "lucide-react";
 
 // COMPONENTE PRINCIPAL: DashboardLayout
@@ -37,10 +38,11 @@ export default function DashboardLayout({
             color: "text-green-500"
         },
         {
-            label: "Órdenes",
-            path: "/dashboard/orders",
-            icon: Pill,
-            color: "text-blue-600"
+            label: "Módulo de Clientes",
+            path: "/dashboard/clients",
+            icon: UserIcon,
+            color: "text-blue-600",
+            className: "text-blue-600"
         },
         // ITEMS COMENTADOS - POTENCIALES FUNCIONALIDADES
         // {
@@ -99,8 +101,8 @@ export default function DashboardLayout({
                         />
                     </div>
 
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        Gestión de Medicamentos
+                    <h1 className="text-2xl font-bold text-gray-800 text-center ">
+                        Interfaz Administrativa Recipe
                     </h1>
 
                 </div>
@@ -131,7 +133,7 @@ export default function DashboardLayout({
                     ${active ? "text-blue-600" : item.color}
                   `}
                                 />
-                                <span className="text-base font-medium">
+                                <span className={`${item.className || 'text-base font-medium'}`}>
                                     {item.label}
                                 </span>
                             </button>
@@ -164,11 +166,11 @@ export default function DashboardLayout({
                 {/* BARRA SUPERIOR */}
                 <header className="bg-white shadow-sm border-b border-gray-200">
                     <div className="px-6 py-4">
-                        <div className="flex items-center justify-between">
+                        <div className="text-lg font-semibold text-center w-full justify-center">
 
                             {/* TÍTULO Y DESCRIPCIÓN */}
                             <div>
-                                <h2 className="text-xl font-semibold text-gray-900">
+                                <h2 className="text-3xl font-semibold text-gray-900">
                                     {menuItems.find(item => item.path === pathname)?.label || "Dashboard"}
                                 </h2>
 

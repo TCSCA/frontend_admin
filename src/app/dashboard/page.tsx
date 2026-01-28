@@ -2,7 +2,6 @@
 'use client';
 
 import { ChartAreaInteractive } from "@/components/indicators/indicator-1";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 export default function Page() {
 

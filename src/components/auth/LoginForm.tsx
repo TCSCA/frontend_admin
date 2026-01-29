@@ -176,7 +176,7 @@ export default function LoginForm() {
 
         console.log("routerrrrr", 'response');
 
-        router.push(`/dashboard`);
+        router.push(`/dashboard/clients`);
 
       } else {
         // reset({ password: "" });

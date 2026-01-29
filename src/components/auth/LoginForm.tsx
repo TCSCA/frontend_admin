@@ -76,6 +76,7 @@ import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
 import { Messages } from "@/lib/messages";
 import { ResponseApi } from "@/types/response";
+import { setTimeout } from "timers";
 
 const formSchema = z.object({
   username: z
@@ -139,13 +140,17 @@ export default function LoginForm() {
     try {
       setUsername(username);
       setPassword(password);
-      // const response: ResponseApi = await callApi.post("/api/auth/login", {
-      //   username: username,
-      //   password: password,
-      // });
+      const response: ResponseApi = await callApi.post("/api/admin/login", {
+        username: username,
+        password: password,
+      });
+      console.log(response);
 
       // if (response.status) {
       if (true) {
+        setTimeout(() => {
+          router.push(`/dashboard/clients`);
+        }, 100000);
         setSubmitSuccess(true);
         console.log("Login exitoso:", true);
 
@@ -175,8 +180,6 @@ export default function LoginForm() {
         console.log("cookies luego de hacer login", Cookies.get());
 
         console.log("routerrrrr", 'response');
-
-        router.push(`/dashboard/clients`);
 
       } else {
         // reset({ password: "" });

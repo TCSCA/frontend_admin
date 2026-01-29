@@ -31,12 +31,12 @@ export default function DashboardLayout({
 
     // ITEMS DEL MENÚ DE NAVEGACIÓN
     const menuItems = [
-        {
-            label: "Indicadores",
-            path: "/dashboard",
-            icon: FileUp,
-            color: "text-green-500"
-        },
+        // {
+        //     label: "Indicadores",
+        //     path: "/dashboard",
+        //     icon: FileUp,
+        //     color: "text-green-500"
+        // },
         {
             label: "Módulo de Clientes",
             path: "/dashboard/clients",
@@ -51,12 +51,12 @@ export default function DashboardLayout({
         //   icon: FileUp,
         //   color: "text-blue-500"
         // },
-        {
-            label: "Nota de entrega",
-            path: "/dashboard/delivery-note",
-            icon: Truck,
-            color: "text-yellow-500"
-        },
+        // {
+        //     label: "Nota de entrega",
+        //     path: "/dashboard/delivery-note",
+        //     icon: Truck,
+        //     color: "text-yellow-500"
+        // },
         // {
         //   label: "Facturación",
         //   path: "/dashboard/billing",

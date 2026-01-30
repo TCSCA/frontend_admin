@@ -30,8 +30,8 @@ export default function ClientsTableWrapper({}: ClientsTableWrapperProps) {
         // Mock data for now - remove this when you connect to your API
         setTimeout(() => {
           setClients([
-            { id: 1, name: 'Client 1', email: 'client1@example.com', status: 'active' },
-            { id: 2, name: 'Client 2', email: 'client2@example.com', status: 'inactive' },
+            { id: 1, name: 'Client 1', email: 'client1@example.com', status: 'entregado' },
+            { id: 2, name: 'Client 2', email: 'client2@example.com', status: 'pendiente' },
             // Add more mock data as needed
           ]);
           setTotalItems(2);

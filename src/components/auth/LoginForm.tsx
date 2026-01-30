@@ -76,6 +76,10 @@ import { useToast } from "@/hooks/use-toast";
 import Cookies from "js-cookie";
 import { Messages } from "@/lib/messages";
 import { ResponseApi } from "@/types/response";
+import { setTimeout } from "timers";
+import GlobalModal from "../global/globalModal";
+import { LoginResponse } from "@/types/loginResponse";
+import { useSpinner } from "@/context/SpinnerContext";
 
 const formSchema = z.object({
   username: z
@@ -117,7 +121,7 @@ export default function LoginForm() {
     },
   });
 
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -126,71 +130,42 @@ export default function LoginForm() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [authenticationType, setAuthenticationType] = useState<string>("");
+  const [idUser, setIdUser] = useState<number>();
+  const { showSpinner, hideSpinner, isLoading } = useSpinner();
+  // Modal State
+  const [showActiveSessionModal, setShowActiveSessionModal] = useState(false);
+  const [activeSessionMessage, setActiveSessionMessage] = useState("");
 
   const onSubmit = async (data: FormData) => {
-    setIsLoading(true);
+    // setIsLoading(true);
     setSubmitError(null);
     setSubmitSuccess(false);
 
     login(data.username, data.password, data.rememberMe || false);
   };
 
-  const login = async (username: string, password: string, rememberMe: boolean) => {
+  const onConfirmSessions = async () => {
+    setShowActiveSessionModal(false);
+    showSpinner();
     try {
-      setUsername(username);
-      setPassword(password);
-      // const response: ResponseApi = await callApi.post("/api/auth/login", {
-      //   username: username,
-      //   password: password,
-      // });
+      const response: ResponseApi = await callApi.post("/api/admin/force-logout", {
+        id_user: idUser,
+      });
 
-      // if (response.status) {
-      if (true) {
-        setSubmitSuccess(true);
-        console.log("Login exitoso:", true);
-
-        // Set session cookies
-        // const cookieOptions = { 
-        //   expires: 1,
-        //   secure: true,
-        //   sameSite: 'strict' as const
-        // };
-
-        // Set auth cookies
-        Cookies.set("token", "equis", { expires: 1 });
-        // Cookies.set("username", response.data.user.nombre, cookieOptions);
-        // Cookies.set("email", response.data.user.mail, cookieOptions);
-        // Cookies.set("idProfile", response.data.perfil.id_perfil, cookieOptions);
-        // Cookies.set("idUser", response.data.user.id_usuario, cookieOptions);
-
-        // Handle remember me
-        // if (rememberMe) {
-        //   Cookies.set("rememberMe", "true", { ...cookieOptions, expires: 30 });
-        //   Cookies.set("loginUsername", username, { ...cookieOptions, expires: 30 });
-        // } else {
-        //   Cookies.remove("rememberMe");
-        //   Cookies.remove("loginUsername");
-        // }
-
-        console.log("cookies luego de hacer login", Cookies.get());
-
-        console.log("routerrrrr", 'response');
-
-        router.push(`/dashboard/clients`);
-
+      if (response.status) {
+        login(username, password, Boolean(Cookies.get("rememberMe")));
       } else {
-        // reset({ password: "" });
-        // // Handle login failure
-        // const errorMessage = response.data?.message || response.message || "Credenciales inválidas";
-        // console.log("Login fallido:", response.message);
-        // setSubmitError(errorMessage);
-        // toast({
-        //   title: "Error",
-        //   description: errorMessage,
-        //   variant: "destructive",
-        // });
+        const errorMessage = response.data?.message || response.message || "Error al cerrar sesión activa";
+        console.log("Force-logout fallido:", response.message);
+        setSubmitError(errorMessage);
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
     } catch (error) {
+      hideSpinner();
       const errorMessage = error instanceof Error ? error.message : "No se pudo conectar con el servidor";
       console.error("Error en el login:", error);
       setSubmitError(errorMessage);
@@ -200,12 +175,100 @@ export default function LoginForm() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
+      hideSpinner()
+    }
+  }
+
+  const login = async (username: string, password: string, rememberMe: boolean) => {
+    try {
+      showSpinner();
+      setUsername(username);
+      setPassword(password);
+      const response: LoginResponse = await callApi.post("/api/admin/login", {
+        username: username,
+        password: password,
+      });
+
+      if (response.status) {
+        if (response.hasActiveSession) {
+          setIdUser(response.id_user);
+          // setIsLoading(false);
+          setActiveSessionMessage(response.message);
+          setShowActiveSessionModal(true);
+          return;
+        }
+        // setTimeout(() => {
+        //   router.push(`/dashboard/clients`);
+        // }, 100000);
+        setSubmitSuccess(true);
+        console.log("Login exitoso:", true);
+
+        // Set session cookies
+        const cookieOptions = {
+          expires: 1,
+          secure: true,
+          sameSite: 'strict' as const
+        };
+
+        // Set auth cookies
+        Cookies.set("token", response.data.token, { expires: 1 });
+        // Cookies.set("username", response.data.user.nombre, cookieOptions);
+        // Cookies.set("email", response.data.user.mail, cookieOptions);
+        Cookies.set("idProfile", response.data.id_profile, cookieOptions);
+        Cookies.set("idUser", response.data.id_user, cookieOptions);
+
+        // Handle remember me
+        if (rememberMe) {
+          Cookies.set("rememberMe", "true", { ...cookieOptions, expires: 30 });
+          Cookies.set("loginUsername", username, { ...cookieOptions, expires: 30 });
+        } else {
+          Cookies.remove("rememberMe");
+          Cookies.remove("loginUsername");
+        }
+
+        router.push(`/dashboard/clients`);
+
+      } else {
+        reset({ password: "" });
+        // Handle login failure
+        const errorMessage = response.data?.message || response.message || "Credenciales inválidas";
+        console.log("Login fallido:", response.message);
+        setSubmitError(errorMessage);
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      hideSpinner();
+      const errorMessage = error instanceof Error ? error.message : "No se pudo conectar con el servidor";
+      console.error("Error en el login:", error);
+      setSubmitError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+
+    } finally {
+      hideSpinner()
     }
   };
 
   return (
     <div className="w-full">
+      <GlobalModal
+        open={showActiveSessionModal}
+        onClose={() => setShowActiveSessionModal(false)}
+        title="Atención"
+        message={activeSessionMessage}
+        onConfirm={() => onConfirmSessions()}
+        confirmText="Aceptar"
+        showCancelButton={true}
+        onCancel={() => setShowActiveSessionModal(false)}
+      />
       {submitError && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {submitError}

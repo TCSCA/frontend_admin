@@ -28,7 +28,7 @@ interface AuthLayoutProps {
 
 export default function AuthPage({
   backgroundImage = `/${process.env.NEXT_PUBLIC_API_BASE_URL_ASSETS}/assets/login.jpg`,
-  overlayGradient = 'bg-gradient-to-br from-blue-900/80 to-indigo-900/80',
+  overlayGradient = 'bg-gradient-to-br from-green-600/80 to-lime-600/80',
   logoLight = {
     src: `/${process.env.NEXT_PUBLIC_API_BASE_URL_ASSETS}/assets/icon.png`,
     alt: '',

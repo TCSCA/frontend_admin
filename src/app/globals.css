@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.header-style {
+  background-color: var(--contrastbackground); 
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -11,6 +15,7 @@
   :root {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
+    
   }
 }
 
@@ -19,12 +24,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-contrastbackground: var(--contrastbackground);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --contrastbackground: #040428;
   }
 }
 
@@ -40,6 +47,7 @@ body {
   --card: 255 255 255;
   --card-foreground: 20 20 20;
   --muted: 243 244 246;
+  --contrastbackground: #040428;
   --muted-foreground: 80 80 80;
   --border: 210 210 215;
   --input: 230 230 235;

@@ -129,7 +129,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
 
   return (
     <div className="space-y-4 w-full">
-      <div className="overflow-x-auto overflow-y-auto max-h-[500px] rounded-xl shadow-lg bg-white w-full">
+      <div className="overflow-x-auto overflow-y-auto max-h-[600px] rounded-lg shadow-md bg-white w-full text-xs">
         <Table
           aria-label={ariaLabel}
           className="min-w-full divide-y divide-gray-200"
@@ -138,9 +138,8 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
             {columns.map((column) => (
               <TableColumn
                 key={column.key}
-                className={`bg-contrastbackground text-white font-medium px-6 py-4 text-left tracking-wider ${
-                  column.key === "action" ? "w-24" : ""
-                }`}
+                className={`text-xs bg-gray-200 text-black font-medium px-3 py-2 text-left tracking-normal ${column.key === "action" ? "w-16" : ""
+                  }`}
               >
                 {column.key === "action" ? (
                   <span className="font-semibold flex items-center justify-start h-full">
@@ -152,17 +151,15 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
                     onClick={() => handleSort(column.key)}
                     className="h-auto p-0 font-semibold hover:bg-transparent whitespace-normal w-full text-left justify-start gap-1"
                   >
-                    <span className="text-left">{column.label}</span>
+                    <span className="text-left text-xs">{column.label}</span>
                     <ArrowUpDown
-                      className={`h-4 w-4 flex-shrink-0 ml-1 ${
-                        sortField === column.key
+                      className={`h-4 w-4 flex-shrink-0 ml-1 ${sortField === column.key
                           ? "text-white"
                           : "text-gray-300 opacity-80"
-                      } ${
-                        sortField === column.key && sortDirection === "asc"
+                        } ${sortField === column.key && sortDirection === "asc"
                           ? "rotate-180"
                           : ""
-                      }`}
+                        }`}
                     />
                   </Button>
                 )}
@@ -178,7 +175,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
               >
                 {(columnKey) =>
                   columnKey === "action" ? (
-                    <TableCell className="px-6 py-4 text-gray-700 first:pl-6 last:pr-6">
+                    <TableCell className="px-3 py-2 text-xs text-gray-700 first:pl-3 last:pr-3">
                       {table != "requests" ? (
                         <div className="flex items-center">
                           <Button
@@ -186,7 +183,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
                             className="text-contrastbackground hover:text-lightblue"
                             onClick={() => onView && onView(item)}
                           >
-                            <Eye className="w-5 h-5" />
+                            <Eye className="w-4 h-4" />
                           </Button>
                         </div>
                       ) : table === "requests" &&
@@ -212,7 +209,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
                       ) : null}
                     </TableCell>
                   ) : (
-                    <TableCell className="px-6 py-4 text-gray-700 first:pl-6 last:pr-6">
+                    <TableCell className="px-3 py-2 text-xs text-gray-700 first:pl-3 last:pr-3">
                       {columnKey === "plataforma" ? (
                         <div className="flex items-center">
                           {item.plataforma ? (
@@ -239,14 +236,13 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
                         <div className="flex items-center">
                           {item.t_estado_oportunidad || item.stage_id ? (
                             <Badge
-                              className={`inline-flex items-center w-fit w-48 ${
-                                item.stage_class ||
+                              className={`inline-flex items-center w-fit w-48 ${item.stage_class ||
                                 getStatusClass(
                                   item.t_estado_oportunidad ||
-                                    item.stage_id ||
-                                    ""
+                                  item.stage_id ||
+                                  ""
                                 )
-                              }`}
+                                }`}
                             >
                               <div className="w-2 mr-1">
                                 {item["data-stage-icon"] || null}
@@ -339,7 +335,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
         <div className="text-sm text-muted-foreground">
           {sortedRows.length > 0
             ? `Mostrando ${startDisplay} a ${endCount} de ${sortedRows.length}`
-            : "No hay proyectos para mostrar"}
+            : "No hay información para mostrar"}
         </div>
       </div>
     </div>

@@ -13,6 +13,10 @@ import {
     FileUp,
     UserIcon
 } from "lucide-react";
+import { ResponseApi } from "@/types/response";
+import callApi from "@/lib/callApi";
+import Cookies from "js-cookie";
+import { useSpinner } from "@/context/SpinnerContext";
 
 // COMPONENTE PRINCIPAL: DashboardLayout
 export default function DashboardLayout({
@@ -24,9 +28,21 @@ export default function DashboardLayout({
     const router = useRouter();
     const pathname = usePathname();
     const { logout } = useAuthStore();
+    const { showSpinner, hideSpinner } = useSpinner();
+    const handleLogout = async () => {
+        try {
+            showSpinner();
+            const response: ResponseApi = await callApi.post("/api/admin/logout", {
+                id_usuario: Cookies.get("idUser"),
+            });
 
-    const handleLogout = () => {
-        logout();
+        } catch (error) {
+
+        } finally {
+            hideSpinner();
+            logout();
+        }
+
     };
 
     // ITEMS DEL MENÚ DE NAVEGACIÓN

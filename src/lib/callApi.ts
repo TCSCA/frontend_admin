@@ -33,7 +33,7 @@ callApi.interceptors.request.use(
 callApi.interceptors.response.use(
     (response) => {
         console.log('Response interceptor:', response.data);
-        response.data = formatApiMessage(response);
+        // response.data = formatApiMessage(response);
         return response.data;
     },
     (error) => {

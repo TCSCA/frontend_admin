@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>()(
         set({ token: null });
 
         if (typeof window !== "undefined") {
-          window.location.href = "/medicamentos";
+          window.location.href = "/desa_medicamentos";
         }
       },
     }),

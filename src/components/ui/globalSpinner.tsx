@@ -9,12 +9,12 @@ export default function GlobalSpinner() {
       <div className="flex flex-col items-center gap-4 p-8 bg-white rounded-2xl shadow-2xl">
         <div className="relative">
           {/* Spinner principal */}
-          <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
-          
+          <Loader2 className="h-16 w-16 animate-spin text-green-600" />
+
           {/* Spinner secundario para efecto */}
-          <Loader2 className="h-12 w-12 animate-spin absolute top-2 left-2 text-blue-400" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+          <Loader2 className="h-12 w-12 animate-spin absolute top-2 left-2 text-green-400" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
         </div>
-        
+
         <div className="text-center">
           <p className="text-xl font-semibold text-gray-800">Cargando...</p>
           <p className="text-sm text-gray-500 mt-1">Por favor espere</p>

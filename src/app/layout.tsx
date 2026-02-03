@@ -10,8 +10,8 @@ const geistSans = GeistSans;
 const geistMono = GeistMono;
 
 export const metadata: Metadata = {
-  title: "Gestión de medicamentos",
-  description: "Sistema de gestión de medicamentos para telemedicina",
+  title: "Interfaz Administrativa",
+  description: "Sistema de interfaz administrativa",
 };
 
 export default function RootLayout({

@@ -253,8 +253,8 @@ export default function ClientTable({
         columns={availableItems}
         rows={rowsWithActions}
         onPageChange={handlePageChange}
-        totalRows={0}
-        totalItems={5}
+        totalRows={rowsWithActions.length}
+        totalItems={rowsWithActions.length}
         onView={handleView}
       />
 

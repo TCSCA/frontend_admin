@@ -24,15 +24,15 @@ interface PaginationButtonProps {
 /**
  * Componente de Paginación en TypeScript
  */
-const Paginator: React.FC<PaginationProps> = ({ 
-  page, 
-  setPage, 
-  totalPages, 
+const Paginator: React.FC<PaginationProps> = ({
+  page,
+  setPage,
+  totalPages,
   total,
-  itemsPerPage, 
-  handleItemsPerPageChange 
+  itemsPerPage,
+  handleItemsPerPageChange
 }) => {
-  
+
   // Función para generar el array de páginas a mostrar (con lógica de truncado)
   const getVisiblePages = (): (number | string)[] => {
     const pages: (number | string)[] = [];
@@ -64,20 +64,20 @@ const Paginator: React.FC<PaginationProps> = ({
 
   const visiblePages = getVisiblePages();
 
-  const PaginationButton: React.FC<PaginationButtonProps> = ({ 
-    children, 
-    onClick, 
-    disabled, 
-    active, 
-    className = "" 
+  const PaginationButton: React.FC<PaginationButtonProps> = ({
+    children,
+    onClick,
+    disabled,
+    active,
+    className = ""
   }) => (
     <button
       onClick={onClick}
       disabled={disabled}
       className={`
         flex items-center justify-center rounded-lg border-2 px-4 py-2 text-base font-medium transition-colors
-        ${active 
-          ? "bg-blue-600 text-white border-blue-600" 
+        ${active
+          ? "bg-blue-600 text-white border-blue-600"
           : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50 hover:text-blue-600"}
         ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
         ${className}
@@ -133,8 +133,8 @@ const Paginator: React.FC<PaginationProps> = ({
                 onClick={() => setPage(p)}
                 className={`
                   w-11 h-11 flex items-center justify-center rounded-lg border-2 text-base font-semibold transition-all
-                  ${page === p 
-                    ? "bg-blue-600 text-white border-blue-600 shadow-md scale-105" 
+                  ${page === p
+                    ? "bg-blue-600 text-white border-blue-600 shadow-md scale-105"
                     : "bg-white text-gray-500 border-gray-200 hover:border-blue-400 hover:text-blue-600"}
                 `}
               >

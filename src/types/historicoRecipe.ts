@@ -1,5 +1,6 @@
 export interface HistoricoRecipe {
     id_recipe: number;
+    id: number;
     Codigo_de_Orden: string;
     Nombre_Paciente: string;
     Cedula_del_Paciente: string;

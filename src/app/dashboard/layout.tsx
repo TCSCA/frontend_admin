@@ -181,12 +181,12 @@ export default function DashboardLayout({
 
                 {/* BARRA SUPERIOR */}
                 <header className="bg-white shadow-sm border-b border-gray-200">
-                    <div className="px-6 py-4">
+                    <div className="px-6 pt-2 pb-1">
                         <div className="text-lg font-semibold text-center w-full justify-center">
 
                             {/* TÍTULO Y DESCRIPCIÓN */}
                             <div>
-                                <h2 className="text-3xl font-semibold text-gray-900">
+                                <h2 className="text-xl font-bold ">
                                     {menuItems.find(item => item.path === pathname)?.label || "Dashboard"}
                                 </h2>
 
@@ -222,7 +222,7 @@ export default function DashboardLayout({
                 </main>
 
                 {/* PIE DE PÁGINA GLOBAL */}
-                <footer className="bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center text-sm text-gray-500">
+                {/* <footer className="bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center text-sm text-gray-500">
                     <div className="flex items-center space-x-1">
                         <span className="font-medium">Versión</span>
                         <span>1.5.3</span>
@@ -239,7 +239,7 @@ export default function DashboardLayout({
                             />
                         </span>
                     </div>
-                </footer>
+                </footer> */}
             </div>
         </div>
     );

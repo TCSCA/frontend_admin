@@ -20,6 +20,7 @@ import { Button } from "./button";
 import { Badge } from "./badge";
 import { useState, useMemo, useEffect, useRef } from "react";
 import StarPriority from "@/components/global/starPriority";
+import Paginator from "./paginator";
 
 interface ColumnType {
   key: string;
@@ -135,10 +136,10 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
           removeWrapper
           aria-label={ariaLabel}
           classNames={{
-            base: "max-h-[600px] overflow-y-auto overflow-x-auto",
+            base: "max-h-[600px] overflow-y-auto overflow-x-auto relative",
             table: "min-w-full divide-y divide-gray-200",
-            thead: "[&>tr]:first:rounded-none",
-            th: "bg-gray-200 text-black font-medium px-3 py-2 text-left tracking-normal",
+            thead: "sticky top-0 z-50 bg-gray-200",
+            th: "bg-gray-200 text-black font-medium px-3 py-2 text-left tracking-normal sticky top-0 z-50",
           }}
         >
           <TableHeader columns={columns}>
@@ -283,67 +284,14 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between px-6">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-muted-foreground">Mostrar</span>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-            className="flex h-9 w-20 rounded-md border border-input bg-background px-3 py-1 text-sm"
-          >
-            {[5, 20, 50, 100].map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
-            ))}
-          </select>
-          <span className="text-sm text-muted-foreground">elementos</span>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (page > 1) {
-                const newPage = page - 1;
-                setPage(newPage);
-                onPageChange && onPageChange(newPage, itemsPerPage);
-              }
-            }}
-            disabled={page === 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Anterior
-          </Button>
-
-          <span className="text-sm text-muted-foreground">
-            Página {page} de {totalPages}
-          </span>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (page < totalPages) {
-                const newPage = page + 1;
-                setPage(newPage);
-                onPageChange && onPageChange(newPage, itemsPerPage);
-              }
-            }}
-            disabled={page >= totalPages}
-          >
-            Siguiente
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="text-sm text-muted-foreground">
-          {sortedRows.length > 0
-            ? `Mostrando ${startDisplay} a ${endCount} de ${sortedRows.length}`
-            : "No hay información para mostrar"}
-        </div>
-      </div>
+      <Paginator
+        page={page}
+        setPage={setPage}
+        totalPages={totalPages}
+        total={totalItems}
+        itemsPerPage={itemsPerPage}
+        handleItemsPerPageChange={setItemsPerPage}
+      />
     </div>
   );
 };

@@ -129,17 +129,23 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
 
   return (
     <div className="space-y-4 w-full">
-      <div className="overflow-x-auto overflow-y-auto max-h-[600px] rounded-lg shadow-md bg-white w-full text-xs">
+      <div className="rounded-lg shadow-md bg-white w-full text-xs">
         <Table
+          isHeaderSticky
+          removeWrapper
           aria-label={ariaLabel}
-          className="min-w-full divide-y divide-gray-200"
+          classNames={{
+            base: "max-h-[300px] overflow-y-auto overflow-x-auto",
+            table: "min-w-full divide-y divide-gray-200",
+            thead: "[&>tr]:first:rounded-none",
+            th: "bg-gray-200 text-black font-medium px-3 py-2 text-left tracking-normal",
+          }}
         >
-          <TableHeader className="w-full">
-            {columns.map((column) => (
+          <TableHeader columns={columns}>
+            {(column) => (
               <TableColumn
                 key={column.key}
-                className={`text-xs bg-gray-200 text-black font-medium px-3 py-2 text-left tracking-normal ${column.key === "action" ? "w-16" : ""
-                  }`}
+                className={column.key === "action" ? "w-16" : ""}
               >
                 {column.key === "action" ? (
                   <span className="font-semibold flex items-center justify-start h-full">
@@ -154,8 +160,8 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
                     <span className="text-left text-xs">{column.label}</span>
                     <ArrowUpDown
                       className={`h-4 w-4 flex-shrink-0 ml-1 ${sortField === column.key
-                          ? "text-white"
-                          : "text-gray-300 opacity-80"
+                        ? "text-white"
+                        : "text-gray-300 opacity-80"
                         } ${sortField === column.key && sortDirection === "asc"
                           ? "rotate-180"
                           : ""
@@ -164,7 +170,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
                   </Button>
                 )}
               </TableColumn>
-            ))}
+            )}
           </TableHeader>
 
           <TableBody items={paginatedRows}>

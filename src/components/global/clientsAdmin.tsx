@@ -5,16 +5,16 @@ import ClientTableWrapper from "../wrappers/ClientsTableWrapper";
 
 
 interface HeroTableClientProps {
-//   dataRequests: any[];
-//   totalRequests: number;
-//   totalPagesRequests: number;
+  dataRequests: any[];
+  // totalRequests: number;
+  // totalPagesRequests: number;
 }
 
 export default function ClientsAdmin({
-//   dataRequests,
-//   totalRequests,
-//   totalPagesRequests,
-  
+  dataRequests,
+  // totalRequests,
+  // totalPagesRequests,
+
 }: HeroTableClientProps,) {
 
 
@@ -22,19 +22,19 @@ export default function ClientsAdmin({
     <>
 
       {/* Content Section */}
-      <div className="mt-4">
+      <div>
         <div className="border-b border-gray-200">
 
         </div>
         <Card className="w-full rounded-t-none rounded-b-2xl shadow-md bg-white mb-6 border-t-0">
           <CardContent>
 
-              <ClientTableWrapper
-                // data={dataRequests}
-                // totalPages={totalPagesRequests}
-                // totalItems={totalRequests}
-              />
-             
+            <ClientTableWrapper
+              data={dataRequests}
+            // totalPages={totalPagesRequests}
+            // totalItems={totalRequests}
+            />
+
           </CardContent>
         </Card>
       </div>

@@ -5,15 +5,7 @@ import { Button } from "@/components/ui/button";
 import FilterSearchbar from "../ui/filterSearchbar";
 import { Eye } from "lucide-react";
 import ClientDetailModal from "../modals/clientDetailModal";
-
-export interface Client {
-  id: number;
-  name: string;
-  email: string;
-  status: 'entregado' | 'pendiente';
-  createdAt?: string;
-  updatedAt?: string;
-}
+import { HistoricoRecipe } from "@/types/historicoRecipe";
 
 interface AvailableItem {
   id: number;
@@ -23,50 +15,100 @@ interface AvailableItem {
 }
 
 const availableItems: AvailableItem[] = [
-  { id: 0, name: "Fecha de Creación de la Orden", key: "createdAt", label: "Fecha de Creación" },
-  { id: 1, name: "Nombre Completo del Paciente", key: "patientName", label: "Nombre Completo del Paciente" },
-  { id: 2, name: "Cedula del Paciente", key: "patientId", label: "Cedula del Paciente"},
-  { id: 3, name: "Estado Ubicación del Paciente", key: "patientLocation", label: "Estado Ubicación del Paciente" },
-  { id: 4, name: "Estatus de la Orden", key: "orderStatus", label: "Estatus de la Orden" },
-  { id: 5, name: "Fecha de Actualización", key: "updatedAt", label: "Fecha de Actualización" },
-  { id: 6, name: "Tiempo de Entrega", key: "deliveryTime", label: "Tiempo de Entrega" },
+  { id: 0, name: "Fecha de Creación", key: "fechaEnTramite", label: "Fecha de Creación" },
+  { id: 1, name: "Nombre Completo del Paciente", key: "Nombre_Paciente", label: "Nombre Completo del Paciente" },
+  { id: 2, name: "Cédula del Paciente", key: "Cedula_del_Paciente", label: "Cédula del Paciente" },
+  { id: 3, name: "Estado Ubicación del Paciente", key: "Direccion_Estado_del_Paciente", label: "Estado Ubicación del Paciente" },
+  { id: 4, name: "Estatus de la Orden", key: "Estado_actual_de_la_orden", label: "Estatus de la Orden" },
+  { id: 5, name: "Fecha de Actualización", key: "fechaActualizacion", label: "Fecha de Actualización" },
+  { id: 6, name: "Tiempo de Entrega", key: "tiempoEntrega", label: "Tiempo de Entrega" },
   { id: 7, name: "Acciones", key: "action", label: "Acciones" },
 ];
 
 interface ClientTableProps {
-  data: Client[];
-  totalPages: number;
-  totalItems: number;
+  data: HistoricoRecipe[];
 }
 
+// Función para combinar fecha y hora en un objeto Date
+const combineDateTime = (fecha: string | null, hora: string | null): Date | null => {
+  if (!fecha || !hora) return null;
+
+  // Si la hora viene en formato HH:MM:SS, la convertimos
+  const [hours, minutes, seconds] = hora.split(':').map(Number);
+  const date = new Date(fecha);
+
+  if (isNaN(date.getTime())) return null;
+
+  date.setHours(hours, minutes, seconds || 0, 0);
+  return date;
+};
+
 // Función para calcular la diferencia de tiempo en formato legible
-const calculateTimeDifference = (startDate: string | Date, endDate: string | Date = new Date()): string => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
-  const diffMs = Math.abs(end.getTime() - start.getTime());
-  
-  // Calcular días, horas y minutos
+const calculateTimeDifference = (startDate: Date | null, endDate: Date | null): string => {
+  if (!startDate || !endDate) return 'N/A';
+
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return 'N/A';
+
+  const diffMs = Math.abs(endDate.getTime() - startDate.getTime());
+
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  
-  if (days > 0) {
-    return `${days}d ${hours}h`;
-  } else if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  if (minutes > 0) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
+};
+
+// Función para calcular tiempo de entrega según las reglas específicas
+const calculateDeliveryTime = (row: HistoricoRecipe): string => {
+  const status = row.Estado_actual_de_la_orden?.toLowerCase();
+  const now = new Date(); // Fecha y hora actual
+
+  // Si es Cancelado, mostrar N/A o no mostrar
+  if (status === 'cancelado') {
+    return 'N/A';
+  }
+
+  // Fecha y hora de inicio (en trámite)
+  const startDateTime = combineDateTime(row.fechaEnTramite, row.horaEnTramite);
+  if (!startDateTime) return 'N/A';
+
+  // Calcular según el estado
+  if (status.includes('entregado')) {
+    // Entregado: fechaEntregado + horaEntregado - fechaEnTramite + horaEnTramite
+    const endDateTime = combineDateTime(row.fechaEntregado, row.horaEntregado);
+    if (!endDateTime) return 'N/A';
+    return calculateTimeDifference(startDateTime, endDateTime);
+
+  } else if (status.includes('proceso') || status.includes('procesado')) {
+    // En Proceso/Procesado: fechaHoy + horaHoy - fechaEnProceso + horaEnProceso
+    const processDateTime = combineDateTime(row.fechaEnProceso, row.horaEnProceso);
+    if (!processDateTime) {
+      // Si no tiene fecha de proceso, usar fecha de creación
+      return calculateTimeDifference(startDateTime, now);
+    }
+    return calculateTimeDifference(processDateTime, now);
+
+  } else if (status.includes('tramite')) {
+    // En Trámite: fechaHoy + horaHoy - fechaEnTramite + horaEnTramite
+    return calculateTimeDifference(startDateTime, now);
+
   } else {
-    return `${minutes}m`;
+    // Para otros estados
+    return calculateTimeDifference(startDateTime, now);
   }
 };
 
-// Función para formatear fecha
-const formatDate = (dateString?: string | Date): string => {
+// Función para formatear fecha (solo fecha, no hora)
+const formatDate = (dateString: string | null): string => {
   if (!dateString) return 'N/A';
-  
+
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return 'Fecha inválida';
-  
+
   return date.toLocaleDateString('es-ES', {
     day: '2-digit',
     month: '2-digit',
@@ -74,29 +116,31 @@ const formatDate = (dateString?: string | Date): string => {
   });
 };
 
+// Función para obtener la última fecha de actualización según el estado
+const getLastUpdateDate = (row: HistoricoRecipe): string | null => {
+  const status = row.Estado_actual_de_la_orden?.toLowerCase();
+
+  if (status.includes('entregado')) {
+    return row.fechaEntregado;
+  } else if (status.includes('proceso') || status.includes('procesado')) {
+    return row.fechaEnProceso;
+  } else if (status.includes('tramite')) {
+    return row.fechaEnTramite;
+  }
+  return row.fechaEnTramite;
+};
+
 export default function ClientTable({
   data = [],
-  totalPages = 1,
-  totalItems: initialTotalItems = 0,
 }: ClientTableProps) {
-  const [collectedRows, setCollectedRows] = useState<Client[]>([]);
-  const [totalItemsCount, setTotalItemsCount] = useState(initialTotalItems);
-  const [currentFilter, setCurrentFilter] = useState<{searchTerm: string}>({ searchTerm: '' });
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [collectedRows, setCollectedRows] = useState<HistoricoRecipe[]>(Array.isArray(data) ? data : []);
+  const [currentFilter, setCurrentFilter] = useState<{ searchTerm: string }>({ searchTerm: '' });
+  const [selectedClient, setSelectedClient] = useState<HistoricoRecipe | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const processedData = data.map(client => ({
-      ...client,
-      createdAt: client.createdAt || new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-      updatedAt: client.updatedAt || (client.status === 'entregado' 
-        ? new Date().toISOString() 
-        : new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()),
-    }));
-    
-    setCollectedRows(processedData);
-    setTotalItemsCount(initialTotalItems);
-  }, [data, initialTotalItems]);
+    setCollectedRows(Array.isArray(data) ? data : []);
+  }, [data]);
 
   const searchByFilter = async (text: string) => {
     setCurrentFilter({ searchTerm: text });
@@ -106,66 +150,82 @@ export default function ClientTable({
     console.log("Page changed to:", page);
   };
 
-  const handleView = (client: Client) => {
+  const handleView = (client: HistoricoRecipe) => {
     setSelectedClient(client);
     setIsModalOpen(true);
   };
 
   const filteredData = useMemo(() => {
+    // Defensive check
+    if (!Array.isArray(collectedRows)) return [];
+
+    // Filter out canceled orders first
+    const activeRows = collectedRows.filter(row =>
+      row.Estado_actual_de_la_orden?.toLowerCase() !== 'cancelado'
+    );
+
     const term = currentFilter.searchTerm.toLowerCase().trim();
-    
+
     if (!term) {
-      return collectedRows;
+      return activeRows;
     }
 
-    return collectedRows.filter(item => {
-      return Object.values(item).some(value => 
+    return activeRows.filter(item => {
+      return Object.values(item).some(value =>
         String(value || '').toLowerCase().includes(term)
       );
     });
   }, [currentFilter.searchTerm, collectedRows]);
 
   const rowsWithActions = useMemo(() => {
-    return collectedRows.map(row => {
-      let deliveryTimeText = 'N/A';
-      let deliveryTimeClass = 'bg-gray-100 text-gray-800';
-      
-      if (row.createdAt) {
-        if (row.status === 'entregado' && row.updatedAt) {
-          // Entregado: fecha actualización - fecha creación (color verde)
-          deliveryTimeText = calculateTimeDifference(row.createdAt, row.updatedAt);
-          deliveryTimeClass = 'bg-green-100 text-green-800 border border-green-200';
-        } else if (row.status === 'pendiente') {
-          // Pendiente: fecha actual - fecha creación (color rojo)
-          deliveryTimeText = calculateTimeDifference(row.createdAt, new Date());
-          deliveryTimeClass = 'bg-red-100 text-red-800 border border-red-200';
-        }
+    if (!Array.isArray(filteredData)) return [];
+
+    return filteredData.map(row => {
+      let statusClass = 'bg-gray-100 text-gray-800 border-gray-200';
+      const status = row.Estado_actual_de_la_orden.toLowerCase();
+
+      if (status.includes('entregado')) {
+        statusClass = 'bg-green-100 text-green-800 border-green-200';
+      } else if (status.includes('proceso') || status.includes('procesado')) {
+        statusClass = 'bg-blue-100 text-blue-800 border-blue-200';
+      } else if (status.includes('tramite')) {
+        statusClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      } else if (status.includes('cancelado')) {
+        statusClass = 'bg-red-100 text-red-800 border-red-200';
       }
-      
+
+      // Última fecha de actualización según el estado
+      const lastUpdate = getLastUpdateDate(row);
+
+      // Calcular tiempo de entrega
+      const tiempoEntrega = calculateDeliveryTime(row);
+
       return {
-        id: row.id,
-        createdAt: formatDate(row.createdAt),
-        patientName: row.name,
-        patientId: row.id,
-        patientLocation: 'No especificada',
-        orderStatus: (
-          <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-            row.status === 'entregado' 
-              ? 'bg-green-100 text-green-800 border border-green-200' 
-              : 'bg-red-100 text-red-800 border border-red-200'
-          }`}>
-            {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+        id: row.id_recipe,
+        fechaEnTramite: formatDate(row.fechaEnTramite),
+        Nombre_Paciente: row.Nombre_Paciente,
+        Cedula_del_Paciente: row.Cedula_del_Paciente,
+        Direccion_Estado_del_Paciente: row.Direccion_Estado_del_Paciente,
+        Estado_actual_de_la_orden: (
+          <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${statusClass}`}>
+            {row.Estado_actual_de_la_orden}
           </span>
         ),
-        updatedAt: formatDate(row.updatedAt),
-        deliveryTime: (
-          <span className={`px-3 py-1.5 rounded-full text-xs font-medium ${deliveryTimeClass}`}>
-            {deliveryTimeText}
-          </span>
+        fechaActualizacion: formatDate(lastUpdate),
+        tiempoEntrega: (
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{tiempoEntrega}</span>
+            {status.includes('entregado') && (
+              <span className="text-xs text-green-600">Tiempo total</span>
+            )}
+            {!status.includes('entregado') && (
+              <span className="text-xs text-amber-600">En progreso</span>
+            )}
+          </div>
         ),
         action: (
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="outline"
             onClick={() => handleView(row)}
             className="h-8 px-3 flex items-center gap-2 w-full justify-center hover:bg-blue-50 hover:text-blue-700 transition-colors"
@@ -176,7 +236,7 @@ export default function ClientTable({
         )
       };
     });
-  }, [collectedRows]);
+  }, [filteredData]);
 
   return (
     <div className="w-full p-4">
@@ -188,20 +248,21 @@ export default function ClientTable({
           />
         </div>
       </div>
-      
+
       <CommonHeroTable
         columns={availableItems}
         rows={rowsWithActions}
         onPageChange={handlePageChange}
-        totalRows={totalPages}
-        totalItems={totalItemsCount}
+        totalRows={0}
+        totalItems={5}
         onView={handleView}
       />
-      
+
       {selectedClient && (
-        <ClientDetailModal 
+        <ClientDetailModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          orderHistory={selectedClient}
           recipes={[]}
         />
       )}

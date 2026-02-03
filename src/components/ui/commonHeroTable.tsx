@@ -135,7 +135,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
           removeWrapper
           aria-label={ariaLabel}
           classNames={{
-            base: "max-h-[300px] overflow-y-auto overflow-x-auto",
+            base: "max-h-[600px] overflow-y-auto overflow-x-auto",
             table: "min-w-full divide-y divide-gray-200",
             thead: "[&>tr]:first:rounded-none",
             th: "bg-gray-200 text-black font-medium px-3 py-2 text-left tracking-normal",

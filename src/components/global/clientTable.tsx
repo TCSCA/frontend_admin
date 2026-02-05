@@ -83,17 +83,8 @@ const calculateDeliveryTime = (row: HistoricoRecipe): string => {
     if (!endDateTime) return 'N/A';
     return calculateTimeDifference(startDateTime, endDateTime);
 
-  } else if (status.includes('proceso') || status.includes('procesado')) {
-    // En Proceso/Procesado: fechaHoy + horaHoy - fechaEnProceso + horaEnProceso
-    const processDateTime = combineDateTime(row.fechaEnProceso, row.horaEnProceso);
-    if (!processDateTime) {
-      // Si no tiene fecha de proceso, usar fecha de creación
-      return calculateTimeDifference(startDateTime, now);
-    }
-    return calculateTimeDifference(processDateTime, now);
-
-  } else if (status.includes('tramite')) {
-    // En Trámite: fechaHoy + horaHoy - fechaEnTramite + horaEnTramite
+  } else if (status.includes('proceso') || status.includes('procesado') || status.includes('tramite')) {
+    // Proceso/Procesado/Trámite: fechaHoy + horaHoy - fechaEnTramite + horaEnTramite
     return calculateTimeDifference(startDateTime, now);
 
   } else {

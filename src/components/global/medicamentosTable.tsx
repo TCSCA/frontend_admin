@@ -59,8 +59,11 @@ export default function MedicamentosTable({
                     >
                         <TableHeader columns={columns}>
                             {(column) => (
-                                <TableColumn key={column.key}>
-                                    <span className="font-semibold text-left text-xs">
+                                <TableColumn
+                                    key={column.key}
+                                    className={column.key === "cantidad" ? "text-right" : ""}
+                                >
+                                    <span className="font-semibold text-xs">
                                         {column.label}
                                     </span>
                                 </TableColumn>
@@ -71,13 +74,15 @@ export default function MedicamentosTable({
                             {(item) => (
                                 <TableRow key={item.id}>
                                     {(columnKey) => (
-                                        <TableCell>
+                                        <TableCell
+                                            className={columnKey === "cantidad" ? "text-right" : ""}
+                                        >
                                             {columnKey === "nombre_comercial" ? (
-                                                <span className="truncate max-w-xs inline-block">
+                                                <span className="truncate max-w-xs inline-block text-base">
                                                     {item.nombre_comercial || "-"}
                                                 </span>
                                             ) : columnKey === "cantidad" ? (
-                                                <span className="truncate max-w-xs inline-block">
+                                                <span className="text-base">
                                                     {item.cantidad || 0}
                                                 </span>
                                             ) : null}

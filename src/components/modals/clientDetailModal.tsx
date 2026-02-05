@@ -6,6 +6,7 @@ import { HistoricoRecipe } from '@/types/historicoRecipe';
 import { Recipe } from '@/types/recipe';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle
@@ -94,24 +95,24 @@ export default function ClientDetailModal({
             id: item.id || index + 1,
           }));
 
-          console.log("Datos originales:", datosOriginales);
+          // console.log("Datos originales:", datosOriginales);
 
-          // Crear array multiplicado x20
-          let medicamentosMultiplicados: any[] = [];
-          const multiplicador = 20;
+          // // Crear array multiplicado x20
+          // let medicamentosMultiplicados: any[] = [];
+          // const multiplicador = 20;
 
-          for (let i = 0; i < multiplicador; i++) {
-            const duplicados = datosOriginales.map(item => ({
-              ...item,
-              id: `${item.id}-${i}`, // Hacer ID único para cada duplicado
-            }));
-            medicamentosMultiplicados = medicamentosMultiplicados.concat(duplicados);
-          }
+          // for (let i = 0; i < multiplicador; i++) {
+          //   const duplicados = datosOriginales.map(item => ({
+          //     ...item,
+          //     id: `${item.id}-${i}`, // Hacer ID único para cada duplicado
+          //   }));
+          //   medicamentosMultiplicados = medicamentosMultiplicados.concat(duplicados);
+          // }
 
-          console.log(`Medicamentos multiplicados x${multiplicador}:`, medicamentosMultiplicados);
-          console.log("Total de items:", medicamentosMultiplicados.length);
+          // console.log(`Medicamentos multiplicados x${multiplicador}:`, medicamentosMultiplicados);
+          // console.log("Total de items:", medicamentosMultiplicados.length);
 
-          setMedicamentos(medicamentosMultiplicados);
+          setMedicamentos(datosOriginales);
         } else {
           console.error("La data no es un array:", responseApi.data);
           setMedicamentos([]);
@@ -130,73 +131,99 @@ export default function ClientDetailModal({
     if (isOpen) getHistoricoRecipeDetalle();
   }, [isOpen])
 
+  const onOpenChange = () => {
+    setMedicamentos([]);
+    onClose();
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] bg-white p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-4">
-          <div className="flex justify-between items-center">
-            <DialogTitle className="flex items-center gap-3 text-xl font-semibold text-gray-800">
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-100 p-2 rounded-lg">
-                  <FileCheck className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold">Detalle de Recipes</h2>
-                  {totalRecipes > 0 && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      {totalRecipes} recipe{totalRecipes !== 1 ? 's' : ''} encontrado{totalRecipes !== 1 ? 's' : ''}
-                    </p>
-                  )}
-                </div>
+          <DialogTitle className="flex items-center gap-3 text-xl font-semibold text-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <FileCheck className="w-6 h-6 text-blue-600" />
               </div>
-            </DialogTitle>
-          </div>
+              <div>
+                <h2 className="text-xl font-bold">Detalle de Recipes</h2>
+                {totalRecipes > 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {totalRecipes} recipe{totalRecipes !== 1 ? 's' : ''} encontrado{totalRecipes !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+            </div>
+          </DialogTitle>
+
         </DialogHeader>
 
         <div className="space-y-6 mx-6 mb-4">
           {orderHistory && (
-            <Card className="border shadow-md overflow-hidden py-0">
-              <CardHeader className="pb-2 pt-4 px-6 bg-gradient-to-r from-blue-50 to-gray-50 border-b">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl font-bold text-gray-800">
-                    Resumen de la Orden: {orderHistory.Codigo_de_Orden}
-                  </CardTitle>
-                  <Badge>
-                    {orderHistory.Estado_actual_de_la_orden}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="px-6 pb-6">
-                <div className="space-y-4">
-                  <h4 className="font-bold text-gray-700 border-b pb-2">Información del Paciente</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Nombre Completo</p>
-                        <p className="font-medium text-base">{orderHistory.Nombre_Paciente}</p>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold text-gray-800">
+                  Información del Paciente
+                </h3>
+                {orderHistory && (
+                  <div className="flex items-center">
+                    <h3 className="text-md font-bold text-gray-800">
+                      Estado de la orden:
+                    </h3>
+                    <Badge className="pr-0">
+                      {orderHistory.Estado_actual_de_la_orden}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+              <Card className="border shadow-md overflow-hidden py-0">
+                {/* <CardHeader className="pb-2 pt-4 px-6 bg-gradient-to-r from-blue-50 to-gray-50 border-b">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-xl font-bold text-gray-800">
+                      Resumen de la Orden: {orderHistory.Codigo_de_Orden}
+                    </CardTitle>
+                    <Badge>
+                      {orderHistory.Estado_actual_de_la_orden}
+                    </Badge>
+                  </div>
+                </CardHeader> */}
+                <CardContent className="px-6 py-4">
+                  <div className="space-y-4">
+                    {/* Grid principal de 3 columnas */}
+                    <div className="grid grid-cols-3 gap-6">
+
+                      {/* Columna 1 */}
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Nombre Completo</p>
+                          <p className="font-medium text-base">{orderHistory.Nombre_Paciente}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Documento de Identidad</p>
-                        <p className="font-medium text-base">{orderHistory.Cedula_del_Paciente}</p>
+
+                      {/* Columna 2 */}
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Documento de Identidad</p>
+                          <p className="font-medium text-base">{orderHistory.Cedula_del_Paciente}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs text-gray-500 mb-1">Estado/Provincia</p>
-                        <p className="font-medium text-base">{orderHistory.Direccion_Estado_del_Paciente}</p>
+
+                      {/* Columna 3 */}
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Estado/Provincia</p>
+                          <p className="font-medium text-base">{orderHistory.Direccion_Estado_del_Paciente}</p>
+                        </div>
                       </div>
-                      {/* <div>
-                        <p className="text-xs text-gray-500 mb-1">Código de Orden</p>
-                        <p className="font-medium text-base">{orderHistory.Codigo_de_Orden}</p>
-                      </div> */}
+
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           )}
           {
-            medicamentos ? (
+            medicamentos && medicamentos.length > 0 ? (
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-bold text-gray-800">

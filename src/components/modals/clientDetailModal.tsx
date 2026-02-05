@@ -196,7 +196,7 @@ export default function ClientDetailModal({
                       <div className="space-y-3">
                         <div>
                           <p className="text-xs text-gray-500 mb-1">Nombre Completo</p>
-                          <p className="font-medium text-base">{orderHistory.Nombre_Paciente}</p>
+                          <p className="font-medium text-xs">{orderHistory.Nombre_Paciente}</p>
                         </div>
                       </div>
 
@@ -204,7 +204,7 @@ export default function ClientDetailModal({
                       <div className="space-y-3">
                         <div>
                           <p className="text-xs text-gray-500 mb-1">Documento de Identidad</p>
-                          <p className="font-medium text-base">{orderHistory.Cedula_del_Paciente}</p>
+                          <p className="font-medium text-xs">{orderHistory.Cedula_del_Paciente}</p>
                         </div>
                       </div>
 
@@ -212,7 +212,7 @@ export default function ClientDetailModal({
                       <div className="space-y-3">
                         <div>
                           <p className="text-xs text-gray-500 mb-1">Estado/Provincia</p>
-                          <p className="font-medium text-base">{orderHistory.Direccion_Estado_del_Paciente}</p>
+                          <p className="font-medium text-xs">{orderHistory.Direccion_Estado_del_Paciente}</p>
                         </div>
                       </div>
 

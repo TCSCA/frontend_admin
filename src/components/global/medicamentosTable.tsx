@@ -78,11 +78,11 @@ export default function MedicamentosTable({
                                             className={columnKey === "cantidad" ? "text-right" : ""}
                                         >
                                             {columnKey === "nombre_comercial" ? (
-                                                <span className="truncate max-w-xs inline-block text-base">
+                                                <span className="truncate max-w-xs inline-block">
                                                     {item.nombre_comercial || "-"}
                                                 </span>
                                             ) : columnKey === "cantidad" ? (
-                                                <span className="text-base">
+                                                <span className="">
                                                     {item.cantidad || 0}
                                                 </span>
                                             ) : null}

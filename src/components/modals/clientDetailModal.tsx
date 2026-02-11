@@ -68,6 +68,14 @@ export interface RecipeDetail {
   id: number;
 }
 
+export interface EstadoOrden {
+  descripcion: string;
+  fecha_cambio: string | null;
+  medicamentos: RecipeDetail[];
+  color: string;
+  completado: boolean;
+}
+
 export default function ClientDetailModal({
   recipes,
   isOpen,
@@ -80,49 +88,101 @@ export default function ClientDetailModal({
     sum + recipe.medicamentos.reduce((sumMed, med) => sumMed + med.cantidad, 0), 0);
 
   const [medicamentos, setMedicamentos] = useState<RecipeDetail[]>();
+  const [estadosOrden, setEstadosOrden] = useState<EstadoOrden[]>();
 
+  // Función para asignar color según el estado
+  const getColorByEstado = (descripcion: string): string => {
+    switch (descripcion) {
+      case 'Pendiente':
+        return '#FF6B6B'; // Rojo
+      case 'En Tramite':
+        return '#4ECDC4'; // Turquesa
+      case 'Procesado':
+        return '#FFD166'; // Amarillo
+      case 'Entregado':
+        return '#06D6A0'; // Verde
+      default:
+        return '#6C757D'; // Gris por defecto
+    }
+  };
 
   const getHistoricoRecipeDetalle = async () => {
     try {
       const responseApi: ResponseApi = await callApi.get(`/api/historico-recipe/detalle/${orderHistory?.id}`, {});
 
       if (responseApi.status && responseApi.data) {
-        // Verificar si es array
         if (Array.isArray(responseApi.data)) {
-          // Primero procesar los datos originales
-          const datosOriginales = responseApi.data.map((item: any, index: number) => ({
-            ...item,
-            id: item.id || index + 1,
-          }));
+          // Lista de todos los estados posibles en orden
+          const todosEstados = ['Pendiente', 'En Tramite', 'Procesado', 'Entregado'];
 
-          // console.log("Datos originales:", datosOriginales);
+          // Crear mapa de estados recibidos
+          const estadosRecibidos = new Map();
+          responseApi.data.forEach(estado => {
+            estadosRecibidos.set(estado.descripcion, estado);
+          });
 
-          // // Crear array multiplicado x20
-          // let medicamentosMultiplicados: any[] = [];
-          // const multiplicador = 20;
+          // Crear array con los 4 estados
+          const estadosCompletos: EstadoOrden[] = todosEstados.map(descripcion => {
+            const estadoRecibido = estadosRecibidos.get(descripcion);
 
-          // for (let i = 0; i < multiplicador; i++) {
-          //   const duplicados = datosOriginales.map(item => ({
-          //     ...item,
-          //     id: `${item.id}-${i}`, // Hacer ID único para cada duplicado
-          //   }));
-          //   medicamentosMultiplicados = medicamentosMultiplicados.concat(duplicados);
-          // }
+            if (estadoRecibido) {
+              return {
+                descripcion: estadoRecibido.descripcion,
+                fecha_cambio: estadoRecibido.fecha_cambio,
+                medicamentos: estadoRecibido.medicamentos || [],
+                color: getColorByEstado(descripcion),
+                completado: true
+              };
+            } else {
+              // Estado no recibido - marcamos como pendiente
+              return {
+                descripcion: descripcion,
+                fecha_cambio: null,
+                medicamentos: [],
+                color: getColorByEstado(descripcion) + '80', // Agregamos transparencia
+                completado: false
+              };
+            }
+          });
 
-          // console.log(`Medicamentos multiplicados x${multiplicador}:`, medicamentosMultiplicados);
-          // console.log("Total de items:", medicamentosMultiplicados.length);
+          setEstadosOrden(estadosCompletos);
 
-          setMedicamentos(datosOriginales);
+          // Extraer solo los medicamentos del último estado COMPLETADO
+          const estadosCompletados = responseApi.data.filter(estado =>
+            estado.descripcion && estado.medicamentos
+          );
+
+          if (estadosCompletados.length > 0) {
+            const ultimoEstado = estadosCompletados[estadosCompletados.length - 1];
+
+            if (ultimoEstado.medicamentos && Array.isArray(ultimoEstado.medicamentos)) {
+              const medicamentosUltimoEstado = ultimoEstado.medicamentos.map((item: any, index: number) => ({
+                ...item,
+                id: index + 1,
+              }));
+
+              setMedicamentos(medicamentosUltimoEstado);
+            } else {
+              console.log("El último estado no tiene medicamentos");
+              setMedicamentos([]);
+            }
+          } else {
+            console.log("No hay estados completados en la respuesta");
+            setMedicamentos([]);
+          }
         } else {
           console.error("La data no es un array:", responseApi.data);
+          setEstadosOrden([]);
           setMedicamentos([]);
         }
       } else {
         console.log("No hay data o status false");
+        setEstadosOrden([]);
         setMedicamentos([]);
       }
     } catch (error) {
       console.error("Error fetching getHistoricoRecipeDetalle:", error);
+      setEstadosOrden([]);
       setMedicamentos([]);
     }
   };
@@ -133,8 +193,22 @@ export default function ClientDetailModal({
 
   const onOpenChange = () => {
     setMedicamentos([]);
+    setEstadosOrden([]);
     onClose();
   }
+
+  // Función para formatear fecha
+  const formatFecha = (fecha: string | null) => {
+    if (!fecha) return 'Pendiente';
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -177,16 +251,6 @@ export default function ClientDetailModal({
                 )}
               </div>
               <Card className="border shadow-md overflow-hidden py-0">
-                {/* <CardHeader className="pb-2 pt-4 px-6 bg-gradient-to-r from-blue-50 to-gray-50 border-b">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl font-bold text-gray-800">
-                      Resumen de la Orden: {orderHistory.Codigo_de_Orden}
-                    </CardTitle>
-                    <Badge>
-                      {orderHistory.Estado_actual_de_la_orden}
-                    </Badge>
-                  </div>
-                </CardHeader> */}
                 <CardContent className="px-6 py-4">
                   <div className="space-y-4">
                     {/* Grid principal de 3 columnas */}
@@ -232,7 +296,6 @@ export default function ClientDetailModal({
                 </div>
                 <MedicamentosTable
                   data={medicamentos}
-                // className="border rounded-lg shadow-sm"
                 />
               </div>
             ) : (
@@ -250,6 +313,60 @@ export default function ClientDetailModal({
               </div>
             )
           }
+          <div className='space-y-3'>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-800">
+                Línea de Tiempo
+              </h3>
+            </div>
+            <Card className="border shadow-md overflow-hidden py-0">
+              <CardContent className="px-6 py-4">
+                <div className="grid grid-cols-4 gap-2">
+                  {estadosOrden && estadosOrden.map((estado, index) => (
+                    <div
+                      key={index}
+                      className={`text-center p-2 rounded-md ${!estado.completado ? 'opacity-50' : ''}`}
+                      style={{
+                        backgroundColor: estado.completado ? `${estado.color}10` : '#f9fafb',
+                        border: `1px solid ${estado.completado ? `${estado.color}30` : '#e5e7eb'}`
+                      }}
+                    >
+                      {/* Indicador circular pequeño */}
+                      <div
+                        className="w-2 h-2 rounded-full mx-auto mb-1"
+                        style={{
+                          backgroundColor: estado.completado ? estado.color : `${estado.color}60`
+                        }}
+                      />
+
+                      {/* Estado */}
+                      <p
+                        className="text-xs font-bold mb-0.5"
+                        style={{ color: estado.completado ? estado.color : '#6b7280' }}
+                      >
+                        {estado.descripcion}
+                      </p>
+
+                      {/* Fecha/Hora */}
+                      <p className="text-xs text-gray-500 leading-tight">
+                        {estado.completado ? (
+                          <>
+                            {new Date(estado.fecha_cambio!).toLocaleDateString('es-ES', {
+                              day: '2-digit',
+                              month: 'short'
+                            })}
+                          </>
+                        ) : (
+                          'Pendiente'
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
         </div>
       </DialogContent>
     </Dialog>

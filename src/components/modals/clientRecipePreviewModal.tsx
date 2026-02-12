@@ -20,7 +20,7 @@ interface ClientRecipePreviewModalProps {
 export default function ClientRecipePreviewModal({
     isOpen,
     onClose,
-    imageUrl = '/assets/login.jpg' // Imagen quemada por defecto
+    imageUrl = '/assets/logo2.png' // Imagen quemada por defecto
 }: ClientRecipePreviewModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>

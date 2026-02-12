@@ -1,8 +1,8 @@
 // next.config.js - Opción B (con trailing slash)
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/i_administrativo',
-  assetPrefix: '/i_administrativo',
+  basePath: '/ordenesmedicas',
+  assetPrefix: '/ordenesmedicas',
   trailingSlash: false, // ← Si la Opción A falla, prueba con true
   eslint: {
     ignoreDuringBuilds: true,
@@ -12,7 +12,7 @@ const nextConfig = {
   },
   images: {
     unoptimized: false,
-    path: '/i_administrativo/_next/image',
+    path: '/ordenesmedicas/_next/image',
     remotePatterns: [
       {
         protocol: 'https',

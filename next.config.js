@@ -13,6 +13,15 @@ const nextConfig = {
   images: {
     unoptimized: false,
     path: '/i_administrativo/_next/image',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'front.tcs.com.ve',
+        port: '',
+        // ⚠️ IMPORTANTE: Incluye la doble barra '//' como está en tu URL
+        pathname: '/desa_apiMedicamentos/storage/deliveryNotes/**',
+      },
+    ],
   },
 };
 

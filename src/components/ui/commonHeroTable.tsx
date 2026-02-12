@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Check,
   X,
+  NotebookText,
 } from "lucide-react";
 import { Button } from "./button";
 import { Badge } from "./badge";
@@ -32,6 +33,7 @@ interface HeroTableProps {
   columns: ColumnType[];
   rows: any[];
   ariaLabel?: string;
+  onPreview?: (item: any) => void;
   onView?: (item: any) => void;
   onUpdate?: (idUpdate: number, item: any) => void;
   onPageChange?: (page: number, limit: number) => void;
@@ -46,6 +48,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
   rows,
   ariaLabel = "Tabla",
   onView,
+  onPreview,
   onUpdate,
   onPageChange,
   onLimitChange,
@@ -149,7 +152,7 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
                 className={column.key === "action" ? "w-16" : ""}
               >
                 {column.key === "action" ? (
-                  <span className="font-semibold flex items-center justify-start h-full">
+                  <span className="font-semibold flex items-center justify-center h-full">
                     {column.label}
                   </span>
                 ) : (
@@ -175,111 +178,123 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
           </TableHeader>
 
           <TableBody items={paginatedRows}>
-            {(item) => (
-              <TableRow
-                key={item.id || item.key || item.id_oportunidad}
-                className="hover:bg-gray-100"
-              >
-                {(columnKey) =>
-                  columnKey === "action" ? (
-                    <TableCell className="px-3 py-2 text-xs text-gray-700 first:pl-3 last:pr-3">
-                      {table != "requests" ? (
-                        <div className="flex items-center">
-                          <Button
-                            title="Ver"
-                            className="text-contrastbackground hover:text-lightblue"
-                            onClick={() => onView && onView(item)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : table === "requests" &&
-                        item.t_estado_solicitud.nombre === "Pendiente" ? (
-                        <div className="flex items-center gap-2">
-                          <Button
-                            onClick={() => onUpdate && onUpdate(1, item)}
-                            className="w-8 h-8 border border-lightblue text-lightblue shadow-md flex items-center justify-center hover:bg-blue-300 transition-colors duration-200 hover:cursor-grab"
-                            title="Aprobar Solicitud"
-                            variant="outline"
-                          >
-                            <Check className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            onClick={() => onUpdate && onUpdate(2, item)}
-                            className="w-8 h-8 border border-red-500 text-red-500 shadow-md flex items-center justify-center hover:bg-red-100 transition-colors duration-200"
-                            title="Rechazar Solicitud"
-                            variant="outline"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : null}
-                    </TableCell>
-                  ) : (
-                    <TableCell className="px-3 py-2 text-xs text-gray-700 first:pl-3 last:pr-3">
-                      {columnKey === "plataforma" ? (
-                        <div className="flex items-center">
-                          {item.plataforma ? (
-                            <Badge
-                              className={`inline-flex items-center text-sm font-medium rounded-md px-3 h-6 w-24 ${getPlatformClass(
-                                item.plataforma
-                              )}`}
+            {(item) => {
+              return (
+                <TableRow
+                  key={item.id || item.key || item.id_oportunidad}
+                  className="hover:bg-gray-100"
+                >
+                  {(columnKey) =>
+                    columnKey === "action" ? (
+                      <TableCell className="px-3 py-2 text-xs text-gray-700 first:pl-3 last:pr-3">
+                        {table != "requests" ? (
+                          <div className="flex items-center">
+
+                            <Button
+                              title="Ver"
+                              className="text-contrastbackground hover:text-lightblue"
+                              onClick={() => onView && onView(item)}
                             >
-                              <span
-                                style={{
-                                  wordBreak: "break-word",
-                                  whiteSpace: "normal",
-                                }}
+                              <NotebookText className="w-4 h-4" />
+                            </Button>
+                            {
+                              item.Estado_actual_de_la_orden.props.children == "Entregado" && item.Nota_entrega && (<Button
+                                title="Ver"
+                                className="text-contrastbackground hover:text-lightblue"
+                                onClick={() => onPreview && onPreview(item)}
                               >
-                                {item.plataforma}
-                              </span>
-                            </Badge>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </div>
-                      ) : columnKey === "t_estado_oportunidad" ||
-                        columnKey === "stage_id" ? (
-                        <div className="flex items-center">
-                          {item.t_estado_oportunidad || item.stage_id ? (
-                            <Badge
-                              className={`inline-flex items-center w-fit w-48 ${item.stage_class ||
-                                getStatusClass(
-                                  item.t_estado_oportunidad ||
-                                  item.stage_id ||
-                                  ""
-                                )
-                                }`}
+                                <Eye className="w-4 h-4" />
+                              </Button>)
+                            }
+                          </div>
+                        ) : table === "requests" &&
+                          item.t_estado_solicitud.nombre === "Pendiente" ? (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              onClick={() => onUpdate && onUpdate(1, item)}
+                              className="w-8 h-8 border border-lightblue text-lightblue shadow-md flex items-center justify-center hover:bg-blue-300 transition-colors duration-200 hover:cursor-grab"
+                              title="Aprobar Solicitud"
+                              variant="outline"
                             >
-                              <div className="w-2 mr-1">
-                                {item["data-stage-icon"] || null}
-                              </div>
-                              <span className="text-sm ml-1 capitalize whitespace-normal break-words text-center">
-                                {item.t_estado_oportunidad || item.stage_id}
-                              </span>
-                            </Badge>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </div>
-                      ) : columnKey === "prioridad" ? (
-                        <StarPriority
-                          value={item.prioridad}
-                          onlyread
-                          onChange={setPriority}
-                        />
-                      ) : (
-                        <span className="truncate max-w-xs inline-block">
-                          {getKeyValue(item, columnKey)
-                            ? getKeyValue(item, columnKey)
-                            : "-"}
-                        </span>
-                      )}
-                    </TableCell>
-                  )
-                }
-              </TableRow>
-            )}
+                              <Check className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={() => onUpdate && onUpdate(2, item)}
+                              className="w-8 h-8 border border-red-500 text-red-500 shadow-md flex items-center justify-center hover:bg-red-100 transition-colors duration-200"
+                              title="Rechazar Solicitud"
+                              variant="outline"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : null}
+                      </TableCell>
+                    ) : (
+                      <TableCell className="px-3 py-2 text-xs text-gray-700 first:pl-3 last:pr-3">
+                        {columnKey === "plataforma" ? (
+                          <div className="flex items-center">
+                            {item.plataforma ? (
+                              <Badge
+                                className={`inline-flex items-center text-sm font-medium rounded-md px-3 h-6 w-24 ${getPlatformClass(
+                                  item.plataforma
+                                )}`}
+                              >
+                                <span
+                                  style={{
+                                    wordBreak: "break-word",
+                                    whiteSpace: "normal",
+                                  }}
+                                >
+                                  {item.plataforma}
+                                </span>
+                              </Badge>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </div>
+                        ) : columnKey === "t_estado_oportunidad" ||
+                          columnKey === "stage_id" ? (
+                          <div className="flex items-center">
+                            {item.t_estado_oportunidad || item.stage_id ? (
+                              <Badge
+                                className={`inline-flex items-center w-fit w-48 ${item.stage_class ||
+                                  getStatusClass(
+                                    item.t_estado_oportunidad ||
+                                    item.stage_id ||
+                                    ""
+                                  )
+                                  }`}
+                              >
+                                <div className="w-2 mr-1">
+                                  {item["data-stage-icon"] || null}
+                                </div>
+                                <span className="text-sm ml-1 capitalize whitespace-normal break-words text-center">
+                                  {item.t_estado_oportunidad || item.stage_id}
+                                </span>
+                              </Badge>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </div>
+                        ) : columnKey === "prioridad" ? (
+                          <StarPriority
+                            value={item.prioridad}
+                            onlyread
+                            onChange={setPriority}
+                          />
+                        ) : (
+                          <span className="truncate max-w-xs inline-block">
+                            {getKeyValue(item, columnKey)
+                              ? getKeyValue(item, columnKey)
+                              : "-"}
+                          </span>
+                        )}
+                      </TableCell>
+                    )
+                  }
+                </TableRow>
+              );
+            }}
           </TableBody>
         </Table>
       </div>

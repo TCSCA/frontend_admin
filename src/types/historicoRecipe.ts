@@ -12,4 +12,5 @@ export interface HistoricoRecipe {
     horaEnProceso: string | null;
     fechaEntregado: string | null;
     horaEntregado: string | null;
+    Nota_entrega: string | null;
 }

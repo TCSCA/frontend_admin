@@ -1,11 +1,12 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import CommonHeroTable from "../ui/commonHeroTable";
 import { Button } from "@/components/ui/button";
 import FilterSearchbar from "../ui/filterSearchbar";
-import { Eye } from "lucide-react";
+import { Eye, Image as ImageIcon } from "lucide-react";
 import ClientDetailModal from "../modals/clientDetailModal";
 import { HistoricoRecipe } from "@/types/historicoRecipe";
+import ClientRecipePreviewModal from "../modals/clientRecipePreviewModal";
 
 interface AvailableItem {
   id: number;
@@ -124,14 +125,11 @@ const getLastUpdateDate = (row: HistoricoRecipe): string | null => {
 export default function ClientTable({
   data = [],
 }: ClientTableProps) {
-  const [collectedRows, setCollectedRows] = useState<HistoricoRecipe[]>(Array.isArray(data) ? data : []);
   const [currentFilter, setCurrentFilter] = useState<{ searchTerm: string }>({ searchTerm: '' });
   const [selectedClient, setSelectedClient] = useState<HistoricoRecipe | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    setCollectedRows(Array.isArray(data) ? data : []);
-  }, [data]);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [selectedPreviewClient, setSelectedPreviewClient] = useState<HistoricoRecipe | null>(null);
 
   const searchByFilter = async (text: string) => {
     setCurrentFilter({ searchTerm: text });
@@ -146,12 +144,17 @@ export default function ClientTable({
     setIsModalOpen(true);
   };
 
+  const handlePreview = (client: HistoricoRecipe) => {
+    setSelectedPreviewClient(client);
+    setIsPreviewModalOpen(true);
+  };
+
   const filteredData = useMemo(() => {
     // Defensive check
-    if (!Array.isArray(collectedRows)) return [];
+    if (!Array.isArray(data)) return [];
 
     // Filter out canceled orders first
-    const activeRows = collectedRows.filter(row =>
+    const activeRows = data.filter(row =>
       row.Estado_actual_de_la_orden?.toLowerCase() !== 'cancelado'
     );
 
@@ -166,7 +169,7 @@ export default function ClientTable({
         String(value || '').toLowerCase().includes(term)
       );
     });
-  }, [currentFilter.searchTerm, collectedRows]);
+  }, [currentFilter.searchTerm, data]);
 
   const rowsWithActions = useMemo(() => {
     if (!Array.isArray(filteredData)) return [];
@@ -193,6 +196,7 @@ export default function ClientTable({
 
       return {
         id: row.id_recipe,
+        Nota_entrega: row.Nota_entrega,
         fechaEnTramite: formatDate(row.fechaEnTramite),
         Nombre_Paciente: row.Nombre_Paciente,
         Cedula_del_Paciente: row.Cedula_del_Paciente,
@@ -215,15 +219,26 @@ export default function ClientTable({
           </div>
         ),
         action: (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleView(row)}
-            className="h-8 px-3 flex items-center gap-2 w-full justify-center hover:bg-blue-50 hover:text-blue-700 transition-colors"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Ver</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleView(row)}
+              className="h-8 px-3 flex items-center gap-2 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Ver</span>
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handlePreview(row)}
+              className="h-8 px-3 flex items-center gap-2 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+            >
+              <ImageIcon className="w-3.5 h-3.5" />
+              <span>Preview</span>
+            </Button>
+          </div>
         )
       };
     });
@@ -247,14 +262,26 @@ export default function ClientTable({
         totalRows={rowsWithActions.length}
         totalItems={rowsWithActions.length}
         onView={handleView}
+        onPreview={handlePreview}
       />
 
+      {/* Modal de Detalle del Cliente */}
       {selectedClient && (
         <ClientDetailModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           orderHistory={selectedClient}
           recipes={[]}
+        />
+      )}
+
+      {/* Modal de Vista Previa de Imagen */}
+      {selectedPreviewClient && (
+        <ClientRecipePreviewModal
+          isOpen={isPreviewModalOpen}
+          onClose={() => setIsPreviewModalOpen(false)}
+          // imageUrl={`/${process.env.NEXT_PUBLIC_API_BASE_URL_ASSETS}/assets/login.jpg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedPreviewClient?.Nota_entrega?.slice(1) ?? null}`}
         />
       )}
     </div>

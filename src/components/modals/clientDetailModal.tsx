@@ -302,11 +302,11 @@ export default function ClientDetailModal({
               <div className="flex flex-col items-center justify-center py-8 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                 <FileCheck className="w-12 h-12 text-gray-300 mb-4" />
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                  Detalles Médicos no disponibles
+                  Detalles de medicamentos no disponibles
                 </h3>
-                <p className="text-gray-500 max-w-sm mb-6">
+                {/* <p className="text-gray-500 max-w-sm mb-6">
                   Esta orden contiene el historial de estados pero los detalles de los medicamentos no están disponibles en la vista histórica.
-                </p>
+                </p> */}
                 <Button onClick={onClose} variant="outline" className="px-8 leading-none h-10">
                   Volver al Listado
                 </Button>

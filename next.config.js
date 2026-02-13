@@ -11,7 +11,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: false,
+    deviceSizes: [],
+    imageSizes: [],
+    unoptimized: true,
     path: '/ordenesmedicas/_next/image',
     remotePatterns: [
       {

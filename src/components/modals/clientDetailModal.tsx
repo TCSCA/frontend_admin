@@ -96,11 +96,11 @@ export default function ClientDetailModal({
       case 'Pendiente':
         return '#FF6B6B'; // Rojo
       case 'En Tramite':
-        return '#4ECDC4'; // Turquesa
+        return '#fcc800'; // Turquesa
       case 'Procesado':
-        return '#FFD166'; // Amarillo
+        return '#2b7fff'; // Amarillo
       case 'Entregado':
-        return '#06D6A0'; // Verde
+        return '#05df72'; // Verde
       default:
         return '#6C757D'; // Gris por defecto
     }
@@ -113,7 +113,7 @@ export default function ClientDetailModal({
       if (responseApi.status && responseApi.data) {
         if (Array.isArray(responseApi.data)) {
           // Lista de todos los estados posibles en orden
-          const todosEstados = ['Pendiente', 'En Tramite', 'Procesado', 'Entregado'];
+          const todosEstados = ['En Tramite', 'Procesado', 'Entregado'];
 
           // Crear mapa de estados recibidos
           const estadosRecibidos = new Map();
@@ -321,7 +321,7 @@ export default function ClientDetailModal({
             </div>
             <Card className="border shadow-md overflow-hidden py-0">
               <CardContent className="px-6 py-4">
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {estadosOrden && estadosOrden.map((estado, index) => (
                     <div
                       key={index}

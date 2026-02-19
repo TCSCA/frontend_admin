@@ -93,11 +93,11 @@ export default function ClientsAdmin({
     getEstadisticasRecipes();
   }, []);
 
-  // Función para calcular porcentaje
   const calcularPorcentaje = (cantidad: number, total: number) => {
-    return total > 0 ? ((cantidad / total) * 100).toFixed(1) : "0";
+    if (total <= 0) return "0.0";
+    const porcentaje = (cantidad / total) * 100;
+    return Math.floor(porcentaje * 10) / 10 + "";
   };
-
   // Estado de carga
   if (loading) {
     return (

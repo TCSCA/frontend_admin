@@ -15,11 +15,13 @@ interface EstadisticaEstado {
   descripcion: string;
   cantidad: number;
   color: string;
+  medicamentos: number;
 }
 
 interface EstadisticasRecipes {
   total: number;
   por_estado: EstadisticaEstado[];
+  totalMedicamentos: number;
 }
 
 export default function ClientsAdmin({
@@ -46,6 +48,14 @@ export default function ClientsAdmin({
     }
   };
 
+  // Función para determinar el tamaño del texto basado en la longitud
+  const getTextSize = (num: number): string => {
+    const length = num.toString().length;
+    if (length >= 4) return 'text-xs';
+    if (length === 3) return 'text-sm';
+    return 'text-base';
+  };
+
   // Función para obtener las estadísticas
   const getEstadisticasRecipes = async () => {
     try {
@@ -66,9 +76,15 @@ export default function ClientsAdmin({
           0
         );
 
+        const totalMedicamentosFiltrado = estadosFiltrados.reduce(
+          (sum: number, estado: any) => sum + estado.medicamentos,
+          0
+        )
+
         // Agregar colores a cada estado
         const dataConColores = {
           total: totalFiltrado,
+          totalMedicamentos: totalMedicamentosFiltrado,
           por_estado: estadosFiltrados.map((estado: any) => ({
             ...estado,
             color: getColorByEstado(estado.descripcion)
@@ -98,6 +114,7 @@ export default function ClientsAdmin({
     const porcentaje = (cantidad / total) * 100;
     return Math.floor(porcentaje * 10) / 10 + "";
   };
+
   // Estado de carga
   if (loading) {
     return (
@@ -177,7 +194,9 @@ export default function ClientsAdmin({
                     border: '2px solid rgba(255, 255, 255, 0.3)'
                   }}
                 >
-                  <span className="text-base font-bold">{estadisticas?.total || 0}</span>
+                  <span className={`font-bold ${getTextSize(estadisticas?.total || 0)}`}>
+                    {estadisticas?.total || 0}
+                  </span>
                 </div>
                 <div className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                   Órdenes
@@ -194,7 +213,9 @@ export default function ClientsAdmin({
                     border: '2px solid rgba(255, 255, 255, 0.3)'
                   }}
                 >
-                  <span className="text-base font-bold">{50}</span>
+                  <span className={`font-bold ${getTextSize(estadisticas?.totalMedicamentos || 0)}`}>
+                    {estadisticas?.totalMedicamentos || 0}
+                  </span>
                 </div>
                 <div className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                   Medicamentos
@@ -202,6 +223,7 @@ export default function ClientsAdmin({
               </div>
             </div>
           </div>
+
           {/* Cards de estados individuales */}
           {estadisticas && estadisticas.por_estado.map((estado) => (
             <div
@@ -247,7 +269,9 @@ export default function ClientsAdmin({
                       border: `2px solid ${estado.color}40`
                     }}
                   >
-                    <span className="text-lg font-bold">{estado.cantidad}</span>
+                    <span className={`font-bold ${getTextSize(estado.cantidad)}`}>
+                      {estado.cantidad}
+                    </span>
                   </div>
                   <div className="text-xs text-gray-500">
                     Órdenes
@@ -264,8 +288,8 @@ export default function ClientsAdmin({
                       border: `2px solid ${estado.color}40`
                     }}
                   >
-                    <span className="text-lg font-bold">
-                      {50}
+                    <span className={`font-bold ${getTextSize(estado.medicamentos)}`}>
+                      {estado.medicamentos}
                     </span>
                   </div>
                   <div className="text-xs text-gray-500">

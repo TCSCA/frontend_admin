@@ -28,7 +28,7 @@ export default function ClientRecipePreviewModal({
                 <DialogHeader className="px-6 pt-4 pb-2 flex flex-row items-center justify-between">
                     <DialogTitle className="flex items-center gap-3 text-xl font-semibold text-gray-800">
                         <div className="flex items-center gap-3">
-                            <div className="bg-blue-100 p-2 rounded-lg">
+                            {/* <div className="bg-blue-100 p-2 rounded-lg">
                                 <Image
                                     src={imageUrl}
                                     alt="Preview icon"
@@ -36,7 +36,7 @@ export default function ClientRecipePreviewModal({
                                     height={24}
                                     className="rounded"
                                 />
-                            </div>
+                            </div> */}
                             <div>
                                 <h2 className="text-xl font-bold">Vista Previa de Imagen</h2>
                                 <p className="text-sm text-gray-500 mt-1">
@@ -61,14 +61,14 @@ export default function ClientRecipePreviewModal({
                 </div>
 
                 <div className="flex justify-end gap-2 px-6 py-4 border-t">
-                    <Button
+                    {/* <Button
                         variant="outline"
                         onClick={() => window.open(imageUrl, '_blank')}
                         className="flex items-center gap-2"
                     >
                         <Download className="h-4 w-4" />
                         Descargar
-                    </Button>
+                    </Button> */}
                     <Button
                         variant="default"
                         onClick={onClose}

@@ -15,11 +15,13 @@ interface EstadisticaEstado {
   descripcion: string;
   cantidad: number;
   color: string;
+  medicamentos: number;
 }
 
 interface EstadisticasRecipes {
   total: number;
   por_estado: EstadisticaEstado[];
+  totalMedicamentos: number;
 }
 
 export default function ClientsAdmin({
@@ -46,6 +48,14 @@ export default function ClientsAdmin({
     }
   };
 
+  // Función para determinar el tamaño del texto basado en la longitud
+  const getTextSize = (num: number): string => {
+    const length = num.toString().length;
+    if (length >= 4) return 'text-xs';
+    if (length === 3) return 'text-sm';
+    return 'text-base';
+  };
+
   // Función para obtener las estadísticas
   const getEstadisticasRecipes = async () => {
     try {
@@ -66,9 +76,15 @@ export default function ClientsAdmin({
           0
         );
 
+        const totalMedicamentosFiltrado = estadosFiltrados.reduce(
+          (sum: number, estado: any) => sum + estado.medicamentos,
+          0
+        )
+
         // Agregar colores a cada estado
         const dataConColores = {
           total: totalFiltrado,
+          totalMedicamentos: totalMedicamentosFiltrado,
           por_estado: estadosFiltrados.map((estado: any) => ({
             ...estado,
             color: getColorByEstado(estado.descripcion)
@@ -98,6 +114,7 @@ export default function ClientsAdmin({
     const porcentaje = (cantidad / total) * 100;
     return Math.floor(porcentaje * 10) / 10 + "";
   };
+
   // Estado de carga
   if (loading) {
     return (
@@ -138,14 +155,14 @@ export default function ClientsAdmin({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {/* Card del Total - Azul premium */}
           <div
-            className="rounded-lg p-3 pb-1 shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
+            className="rounded-lg p-3 shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
             style={{
               background: 'linear-gradient(145deg, #2563EB 0%, #1E40AF 100%)',
               border: 'none'
             }}
           >
-            <div className="flex items-center justify-between mb-2">
-              {/* Círculo con fondo blanco semitransparente */}
+            {/* Fila superior con icono y texto Total */}
+            <div className="flex items-center gap-2 mb-3">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm"
                 style={{
@@ -160,64 +177,76 @@ export default function ClientsAdmin({
                   />
                 </svg>
               </div>
-
-
+              <span className="text-base font-semibold text-white">
+                Total
+              </span>
             </div>
 
-            {/* Contenido principal */}
-            <div className="space-y-0">
-              <div className="text-base font-medium" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                Total de Recipes
+            {/* Totales al estilo de los cards de estados - con círculos del mismo tamaño */}
+            <div className="flex justify-around items-center mt-5">
+              {/* Órdenes */}
+              <div className="text-center">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-1 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    border: '2px solid rgba(255, 255, 255, 0.3)'
+                  }}
+                >
+                  <span className={`font-bold ${getTextSize(estadisticas?.total || 0)}`}>
+                    {estadisticas?.total || 0}
+                  </span>
+                </div>
+                <div className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                  Órdenes
+                </div>
               </div>
-              <div className="flex items-baseline justify-between">
-                <span className="text-xl font-bold text-white">
-                  {estadisticas?.total || 0}
-                </span>
 
+              {/* Medicamentos */}
+              <div className="text-center">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-1 backdrop-blur-sm"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    border: '2px solid rgba(255, 255, 255, 0.3)'
+                  }}
+                >
+                  <span className={`font-bold ${getTextSize(estadisticas?.totalMedicamentos || 0)}`}>
+                    {estadisticas?.totalMedicamentos || 0}
+                  </span>
+                </div>
+                <div className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                  Medicamentos
+                </div>
               </div>
             </div>
-
-
           </div>
 
           {/* Cards de estados individuales */}
           {estadisticas && estadisticas.por_estado.map((estado) => (
             <div
               key={estado.id_estado_recipe}
-              className="flex flex-col justify-between bg-white border rounded-lg p-3 shadow-sm hover:shadow transition-shadow"
+              className="flex flex-col bg-white border rounded-lg p-3 shadow-sm hover:shadow transition-all hover:scale-[1.02]"
             >
-              {/* Indicador circular con número */}
-              <div className="flex items-center justify-between mb-2">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{
-                    backgroundColor: `${estado.color}15`,
-                    color: estado.color,
-                    border: `2px solid ${estado.color}40`
-                  }}
-                >
-                  <span className="text-base font-bold">{estado.cantidad}</span>
-                </div>
-
-                {/* Porcentaje */}
-                <div className="text-right">
-                  <div className="text-base font-bold text-gray-800">
+              {/* Título del estado centrado con porcentaje */}
+              <div className="text-center mb-3">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-base font-bold" style={{ color: estado.color }}>
+                    {estado.descripcion}
+                  </span>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: `${estado.color}15`,
+                      color: estado.color,
+                    }}>
                     {calcularPorcentaje(estado.cantidad, estadisticas.total)}%
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                {/* Nombre del estado */}
-                <div
-                  className="text-base font-bold truncate mb-1"
-                  style={{ color: estado.color }}
-                >
-                  {estado.descripcion}
+                  </span>
                 </div>
 
-                {/* Barra de progreso mini */}
-                <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                {/* Barra de progreso */}
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -225,6 +254,47 @@ export default function ClientsAdmin({
                       backgroundColor: estado.color
                     }}
                   />
+                </div>
+              </div>
+
+              {/* Métricas en fila - ambas con el color del estado */}
+              <div className="flex justify-around items-center">
+                {/* Órdenes */}
+                <div className="text-center">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-1"
+                    style={{
+                      backgroundColor: `${estado.color}15`,
+                      color: estado.color,
+                      border: `2px solid ${estado.color}40`
+                    }}
+                  >
+                    <span className={`font-bold ${getTextSize(estado.cantidad)}`}>
+                      {estado.cantidad}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Órdenes
+                  </div>
+                </div>
+
+                {/* Medicamentos */}
+                <div className="text-center">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-1"
+                    style={{
+                      backgroundColor: `${estado.color}15`,
+                      color: estado.color,
+                      border: `2px solid ${estado.color}40`
+                    }}
+                  >
+                    <span className={`font-bold ${getTextSize(estado.medicamentos)}`}>
+                      {estado.medicamentos}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Medicamentos
+                  </div>
                 </div>
               </div>
             </div>

@@ -7,19 +7,22 @@ const callApi = axios.create({
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
-        // OJO: Esto solo se ejecuta al crear la instancia
-        // El token podría no estar disponible aún
-        'Authorization': `Bearer ${Cookies.get("token") || ""}`,
     },
 });
 
-// Request Interceptor
 callApi.interceptors.request.use(
     (config) => {
-        const token = Cookies.get("token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        if (shouldUseApiKey(config)) {
+            config.headers['x-api-key'] = process.env.NEXT_PUBLIC_API_KEY;
+            delete config.headers.Authorization;
+            console.log('Usando API Key para:', config.url);
+        } else {
+            const token = Cookies.get("token");
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
         }
+
         const fullUrl = `${config.baseURL}/${config.url}`;
         console.log('Request interceptor - URL:', fullUrl);
         return config;
@@ -29,14 +32,25 @@ callApi.interceptors.request.use(
     }
 );
 
-// Response Interceptor
+const shouldUseApiKey = (config: any) => {
+    const apiKeyEndpoints = [
+        '/api/admin/force-logout',
+        '/api/admin/login'
+    ];
+
+    return apiKeyEndpoints.some(endpoint => config.url?.includes(endpoint));
+};
+
 callApi.interceptors.response.use(
     (response) => {
         console.log('Response interceptor:', response.data);
-        // response.data = formatApiMessage(response);
         return response.data;
     },
     (error) => {
+        if (error.response?.status === 401) {
+            console.log('Error de autenticación con API Key');
+        }
+
         return Promise.resolve({
             error: error.message,
             status: false,

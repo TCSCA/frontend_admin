@@ -32,17 +32,20 @@ export default function ClientsAdmin({
   const [error, setError] = useState<string | null>(null);
 
   // IDs de los estados que queremos mostrar
-  const ESTADOS_MOSTRAR = [2, 3, 4]; // En Tramite (2), Procesado (3), Entregado (4)
+  const ESTADOS_MOSTRAR = [2, 3, 4, 7]; // Nueva Orden (2), Procesado (3), Entregado (4), Cerrado (7)
 
   // Función para asignar color según el estado con mejor contraste
   const getColorByEstado = (descripcion: string): string => {
     switch (descripcion) {
+      case 'Nueva Orden':
       case 'En Tramite':
         return '#fcc800';
       case 'Procesado':
         return '#2b7fff';
       case 'Entregado':
         return '#05df72';
+      case 'Cerrado':
+        return '#ef4444';
       default:
         return '#6B7280'; // Gris
     }
@@ -70,13 +73,21 @@ export default function ClientsAdmin({
           (estado: any) => ESTADOS_MOSTRAR.includes(estado.id_estado_recipe)
         );
 
+        // Asegurarnos de que el ID 7 se llame "Cerrado"
+        const estadosMapeados = estadosFiltrados.map((estado: any) => {
+          if (estado.id_estado_recipe === 7) {
+            return { ...estado, descripcion: 'Cerrado' };
+          }
+          return estado;
+        });
+
         // Calcular total solo con los estados filtrados
-        const totalFiltrado = estadosFiltrados.reduce(
+        const totalFiltrado = estadosMapeados.reduce(
           (sum: number, estado: any) => sum + estado.cantidad,
           0
         );
 
-        const totalMedicamentosFiltrado = estadosFiltrados.reduce(
+        const totalMedicamentosFiltrado = estadosMapeados.reduce(
           (sum: number, estado: any) => sum + estado.medicamentos,
           0
         )
@@ -85,11 +96,25 @@ export default function ClientsAdmin({
         const dataConColores = {
           total: totalFiltrado,
           totalMedicamentos: totalMedicamentosFiltrado,
-          por_estado: estadosFiltrados.map((estado: any) => ({
-            ...estado,
-            color: getColorByEstado(estado.descripcion)
-          }))
+          por_estado: estadosMapeados.map((estado: any) => {
+            let descripcionNormalizada = String(estado.descripcion || '').toLowerCase().includes('tramite') ? 'Nueva Orden' : estado.descripcion;
+            if (descripcionNormalizada.toLowerCase().includes('cancelado') || descripcionNormalizada.toLowerCase().includes('cerrado')) {
+              descripcionNormalizada = 'Cerrado';
+            }
+            return {
+              ...estado,
+              descripcion: descripcionNormalizada,
+              color: getColorByEstado(descripcionNormalizada)
+            };
+          })
         };
+
+        // Asegurar que 'Cerrado' esté al final
+        dataConColores.por_estado.sort((a: any, b: any) => {
+          if (a.descripcion === 'Cerrado') return 1;
+          if (b.descripcion === 'Cerrado') return -1;
+          return 0;
+        });
 
         setEstadisticas(dataConColores);
       } else {
@@ -122,7 +147,7 @@ export default function ClientsAdmin({
         <div className="mb-6">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-48 mb-4"></div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white border rounded-lg p-3 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
@@ -152,7 +177,7 @@ export default function ClientsAdmin({
     <>
       {/* Indicadores de estadísticas */}
       <div className="mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           {/* Card del Total - Azul premium */}
           <div
             className="rounded-lg p-3 shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"

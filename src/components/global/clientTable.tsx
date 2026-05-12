@@ -22,7 +22,7 @@ const availableItems: AvailableItem[] = [
   { id: 3, name: "Estado Ubicación del Paciente", key: "Direccion_Estado_del_Paciente", label: "Estado Ubicación del Paciente" },
   { id: 4, name: "Estatus de la Orden", key: "Estado_actual_de_la_orden", label: "Estatus de la Orden" },
   { id: 5, name: "Fecha de Actualización", key: "fechaActualizacion", label: "Fecha de Actualización" },
-  { id: 6, name: "Tiempo de Entrega", key: "tiempoEntrega", label: "Tiempo de Entrega" },
+  // { id: 6, name: "Tiempo de Entrega", key: "tiempoEntrega", label: "Tiempo de Entrega" },
   { id: 7, name: "Acciones", key: "action", label: "Acciones" },
 ];
 
@@ -84,8 +84,8 @@ const calculateDeliveryTime = (row: HistoricoRecipe): string => {
     if (!endDateTime) return 'N/A';
     return calculateTimeDifference(startDateTime, endDateTime);
 
-  } else if (status.includes('proceso') || status.includes('procesado') || status.includes('tramite')) {
-    // Proceso/Procesado/Trámite: fechaHoy + horaHoy - fechaEnTramite + horaEnTramite
+  } else if (status.includes('proceso') || status.includes('procesado') || status.includes('nueva')) {
+    // Proceso/Procesado/Nueva Orden: fechaHoy + horaHoy - fechaEnTramite + horaEnTramite
     return calculateTimeDifference(startDateTime, now);
 
   } else {
@@ -116,7 +116,7 @@ const getLastUpdateDate = (row: HistoricoRecipe): string | null => {
     return row.fechaEntregado;
   } else if (status.includes('proceso') || status.includes('procesado')) {
     return row.fechaEnProceso;
-  } else if (status.includes('tramite')) {
+  } else if (status.includes('tramite') || status.includes('nueva')) {
     return row.fechaEnTramite;
   }
   return row.fechaEnTramite;
@@ -182,9 +182,9 @@ export default function ClientTable({
         statusClass = 'bg-green-100 text-green-800 border-green-200';
       } else if (status.includes('proceso') || status.includes('procesado')) {
         statusClass = 'bg-blue-100 text-blue-800 border-blue-200';
-      } else if (status.includes('tramite')) {
+      } else if (status.includes('tramite') || status.includes('nueva')) {
         statusClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      } else if (status.includes('cancelado')) {
+      } else if (status.includes('cancelado') || status.includes('cerrado')) {
         statusClass = 'bg-red-100 text-red-800 border-red-200';
       }
 
@@ -202,8 +202,10 @@ export default function ClientTable({
         Cedula_del_Paciente: row.Cedula_del_Paciente,
         Direccion_Estado_del_Paciente: row.Direccion_Estado_del_Paciente,
         Estado_actual_de_la_orden: (
-          <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${statusClass}`}>
-            {row.Estado_actual_de_la_orden}
+          <span className={`inline-block w-[90px] py-0.5 rounded-full text-xs font-medium border text-center ${statusClass}`}>
+            {String(row.Estado_actual_de_la_orden || '').toLowerCase().includes('tramite')
+              ? 'Nueva Orden'
+              : (String(row.Estado_actual_de_la_orden || '').toLowerCase().includes('cancelado') ? 'Cerrado' : row.Estado_actual_de_la_orden)}
           </span>
         ),
         fechaActualizacion: formatDate(lastUpdate),

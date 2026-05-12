@@ -25,7 +25,7 @@ export default function ClientsTableWrapper({
       try {
         setIsLoading(true);
 
-        
+
         // Mock data for now - remove this when you connect to your API
         setTimeout(() => {
           setClients(data);
@@ -57,7 +57,7 @@ export default function ClientsTableWrapper({
           variant: "success",
         });
       }
-      
+
       const cleanUrlParams = () => {
         const url = new URL(window.location.href);
         if (url.searchParams.has("refresh") || url.searchParams.has("edit")) {
@@ -76,10 +76,8 @@ export default function ClientsTableWrapper({
 
 
   return (
-    <ClientTable 
+    <ClientTable
       data={clients}
-      // totalPages={totalPages}
-      // totalItems={totalItems}   
-    />  
+    />
   );
 }

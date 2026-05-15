@@ -32,7 +32,7 @@ export default function ClientsAdmin({
   const [error, setError] = useState<string | null>(null);
 
   // IDs de los estados que queremos mostrar
-  const ESTADOS_MOSTRAR = [2, 3, 4, 7]; // Nueva Orden (2), Procesado (3), Entregado (4), Cerrado (7)
+  const ESTADOS_MOSTRAR = [2, 3, 4/*, 7*/]; // Nueva Orden (2), Procesado (3), Entregado (4), Cerrado (7)
 
   // Función para asignar color según el estado con mejor contraste
   const getColorByEstado = (descripcion: string): string => {
@@ -177,7 +177,7 @@ export default function ClientsAdmin({
     <>
       {/* Indicadores de estadísticas */}
       <div className="mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {/* Card del Total - Azul premium */}
           <div
             className="rounded-lg p-3 shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"

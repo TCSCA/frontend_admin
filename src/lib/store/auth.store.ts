@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>()(
         set({ token: null });
 
         if (typeof window !== "undefined") {
-          window.location.href = "/i_administrativo";
+          window.location.href = "/ordenesmedicas";
         }
       },
     }),

@@ -20,14 +20,16 @@ export default async function ClientsPage() {
                     "Content-Type": "application/json",
                 },
             });
-            console.log("Response getReposterHistoricoFechas:", responseApi);
+            console.log("Response historico-recipe/reporte-fechas:",
+                JSON.stringify(responseApi, null, 2)
+            );
 
             if (responseApi.status && responseApi.data) {
                 return Array.isArray(responseApi.data) ? responseApi.data : [];
             }
             return [];
         } catch (error) {
-            console.error("Error fetching getReposterHistoricoFechas:", error);
+            console.error("Error fetching historico-recipe/reporte-fechas:", error);
             return [];
         }
     };

@@ -177,7 +177,14 @@ const CommonHeroTable: React.FC<HeroTableProps> = ({
             )}
           </TableHeader>
 
-          <TableBody items={paginatedRows}>
+          <TableBody 
+            items={paginatedRows} 
+            emptyContent={
+              <div className="py-12 text-base text-gray-500 font-medium text-center">
+                No existen registros
+              </div>
+            }
+          >
             {(item) => {
               return (
                 <TableRow

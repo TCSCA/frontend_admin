@@ -48,7 +48,18 @@ callApi.interceptors.response.use(
     },
     (error) => {
         if (error.response?.status === 401) {
-            console.log('Error de autenticación con API Key');
+            console.log('Error de autenticación: Token inválido o expirado');
+            Cookies.remove('token');
+            Cookies.remove('idUser');
+            Cookies.remove('idProfile');
+            if (typeof window !== 'undefined') {
+                const loginUrl = process.env.NEXT_PUBLIC_API_BASE_URL_ASSETS 
+                    ? `/${process.env.NEXT_PUBLIC_API_BASE_URL_ASSETS}` 
+                    : '/';
+                if (!window.location.pathname.endsWith(loginUrl) && window.location.pathname !== '/') {
+                    window.location.href = loginUrl;
+                }
+            }
         }
 
         return Promise.resolve({

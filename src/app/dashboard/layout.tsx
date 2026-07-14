@@ -45,6 +45,41 @@ export default function DashboardLayout({
 
     };
 
+    // EFECTO PARA AUTO-CERRAR SESIÓN POR INACTIVIDAD
+    React.useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+
+        // Tiempo de inactividad permitido: 2 horas = 7200 segundos = 7200000 ms
+        const IDLE_TIME = 7200000;  
+
+        const resetTimer = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                // Se acabó el tiempo de inactividad, cerrar sesión
+                handleLogout();
+            }, IDLE_TIME);
+        };
+
+        // Escuchar estos eventos como "actividad del usuario"
+        const activityEvents = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+
+        // Iniciar el timer la primera vez
+        resetTimer();
+
+        // Agregar los listeners al window
+        activityEvents.forEach(event => {
+            window.addEventListener(event, resetTimer);
+        });
+
+        // Limpieza al desmontar el componente
+        return () => {
+            clearTimeout(timeoutId);
+            activityEvents.forEach(event => {
+                window.removeEventListener(event, resetTimer);
+            });
+        };
+    }, []);
+
     // ITEMS DEL MENÚ DE NAVEGACIÓN
     const menuItems = [
         // {

@@ -3,7 +3,7 @@ const path = require('path');
 const dotenv = require('dotenv');
 
 // Ruta al .env externo en producción (en el servidor)
-const prodEnvPath = '/var/www/proyectos/archivos/InterfazAdministrativa/.env';
+const prodEnvPath = '/var/www/proyecto/InterfazAdministrativa/archivos/.env';
 
 if (fs.existsSync(prodEnvPath)) {
   console.log(`Cargando variables de entorno desde: ${prodEnvPath}`);
